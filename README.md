@@ -2,13 +2,11 @@
 
 # Datastar Haskell SDK
 
-[![Test](https://github.com/carlohamalainen/datastar-hs/actions/workflows/test.yml/badge.svg)](https://github.com/carlohamalainen/datastar-hs/actions/workflows/test.yml)
+[![Test](https://github.com/starfederation/datastar-haskell/actions/workflows/test.yml/badge.svg)](https://github.com/starfederation/datastar-haskell/actions/workflows/test.yml)
 
 A Haskell implementation of the [Datastar](https://data-star.dev/) SDK for building real-time hypermedia applications with server-sent events (SSE).
 
 Live examples: <https://hamalainen.dev>
-
-To minimise dependencies for the library, examples are hosted in a separate repo: <https://github.com/carlohamalainen/datastar-hs-examples>
 
 ## License
 
@@ -38,7 +36,7 @@ simple pattern matching on `(requestMethod, pathInfo)`.
 import Hypermedia.Datastar
 
 -- Create an SSE response
-sseResponse :: (ServerSentEventGenerator -> IO ()) -> Response
+sseResponse :: DatastarLogger -> (ServerSentEventGenerator -> IO ()) -> Response
 
 -- Send events
 sendPatchElements  :: ServerSentEventGenerator -> PatchElements  -> IO ()
@@ -63,7 +61,7 @@ app req respond =
   case (requestMethod req, pathInfo req) of
     ("GET", ["hello"]) -> do
       Right signals <- readSignals req
-      respond $ sseResponse $ \gen -> do
+      respond $ sseResponse nullLogger $ \gen -> do
         sendPatchElements gen (patchElements "<div id=\"message\">Hello!</div>")
     _ ->
       respond $ responseLBS status404 [] "Not found"

@@ -19,10 +19,10 @@ data DatastarLogger = DatastarLogger
 nullLogger :: DatastarLogger
 nullLogger =
   DatastarLogger
-    { logDebug = const (pure ())
-    , logInfo = const (pure ())
-    , logWarn = const (pure ())
-    , logError = const (pure ())
+    { logDebug = \_ -> pure ()
+    , logInfo = \_ -> pure ()
+    , logWarn = \_ -> pure ()
+    , logError = \_ -> pure ()
     }
 
 stderrLogger :: DatastarLogger

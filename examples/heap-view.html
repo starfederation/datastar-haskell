@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>GHC Heap Visualizer</title>
+        <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+        <style type="text/tailwindcss">
+            @custom-variant dark (&:where(.dark, .dark *));
+            html { scroll-behavior: smooth; }
+        </style>
+        <script
+            type="module"
+            src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"
+        ></script>
+    </head>
+    <body
+        data-signals:dark="false"
+        data-signals:highlight="''"
+        data-class="{'dark': $dark}"
+        class="bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-300 min-h-screen p-8 transition-colors duration-200"
+    >
+        <div id="main" data-init="@get('reset')">
+            <div class="flex items-center justify-center h-64">
+                <p class="text-gray-500 text-lg">Loading heap data...</p>
+            </div>
+        </div>
+    </body>
+</html>

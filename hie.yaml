@@ -1,0 +1,16 @@
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:datastar-hs"
+    - path: "test"
+      component: "datastar-hs:test:datastar-hs-test"
+    - path: "examples/hello-world-warp.hs"
+      component: "datastar-hs:exe:hello-world-warp"
+    - path: "examples/hello-world-servant.hs"
+      component: "datastar-hs:exe:hello-world-servant"
+    - path: "examples/hello-world-channel.hs"
+      component: "datastar-hs:exe:hello-world-channel"
+    - path: "examples/activity-feed.hs"
+      component: "datastar-hs:exe:activity-feed"
+    - path: "examples/heap-view.hs"
+      component: "datastar-hs:exe:heap-view"

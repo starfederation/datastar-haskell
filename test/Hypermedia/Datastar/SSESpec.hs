@@ -13,6 +13,7 @@ import Hypermedia.Datastar.PatchElements
 import Hypermedia.Datastar.PatchSignals
 import Hypermedia.Datastar.Types
 import Hypermedia.Datastar.WAI (renderEvent)
+import Hypermedia.Datastar.Logger (nullLogger)
 import Network.Wai.Internal (Response (..))
 
 render :: DatastarEvent -> String
@@ -51,7 +52,7 @@ spec = do
           e1 = "<div id=\"b\">2</div>"
           e2 = "{\"count\": 42}"
 
-          resp = sseResponse $ \gen -> do
+          resp = sseResponse nullLogger $ \gen -> do
             sendPatchElements gen (patchElements e0)
             sendPatchElements gen (patchElements e1)
             sendPatchSignals gen (patchSignals e2)
