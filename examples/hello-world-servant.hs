@@ -48,7 +48,7 @@ serveHelloWorld = Tagged $ \req respond -> do
   signalsResult <- readSignals req :: IO (Either String Signals)
   case signalsResult of
     Left _ -> respond $ Wai.responseLBS status404 [] "Bad signals"
-    Right signals -> respond $ sseResponse $ \gen ->
+    Right signals -> respond $ sseResponse nullLogger $ \gen ->
       mapM_
         ( \i -> do
             let html = "<div id='message'>" <> T.pack (take i message) <> "</div>"

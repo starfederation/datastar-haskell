@@ -516,7 +516,7 @@ sendHeapUpdate appState sess gen = do
 
 handleHeap :: AppState -> Session -> (Response -> IO b) -> IO b
 handleHeap appState sess respond =
-  respond $ sseResponse $ \gen ->
+  respond $ sseResponse nullLogger $ \gen ->
     sendHeapUpdate appState sess gen
 
 handleForce :: AppState -> Session -> Request -> (Response -> IO b) -> IO b
@@ -525,7 +525,7 @@ handleForce appState sess req respond = do
   case lookup "addr" params of
     Just (Just addr) -> do
       forceThunk sess addr
-      respond $ sseResponse $ \gen ->
+      respond $ sseResponse nullLogger $ \gen ->
         sendHeapUpdate appState sess gen
     _ ->
       respond $ responseLBS status400 [] "Missing addr parameter"
@@ -541,7 +541,7 @@ handleReset appState req respond = do
         Nothing -> newSession appState
     Nothing -> newSession appState
   modeSetup (appMode appState) sess
-  respond $ sseResponse $ \gen ->
+  respond $ sseResponse nullLogger $ \gen ->
     sendHeapUpdate appState sess gen
 
 handleRun :: AppState -> Session -> (Response -> IO b) -> IO b
@@ -549,7 +549,7 @@ handleRun appState sess respond = do
   case modeRun (appMode appState) of
     Just run -> do
       run sess
-      respond $ sseResponse $ \gen -> do
+      respond $ sseResponse nullLogger $ \gen -> do
         -- Stream live updates every 200ms for ~12 seconds
         replicateM_ 60 $ do
           sendHeapUpdate appState sess gen

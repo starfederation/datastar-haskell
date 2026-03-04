@@ -109,7 +109,7 @@ handleGenerate req respond = do
   signalsResult <- readSignals req :: IO (Either String Signals)
   case signalsResult of
     Left err -> respond $ responseLBS status404 [] (LBS.fromStrict $ BS8.pack $ "Bad signals: " <> err)
-    Right signals -> respond $ sseResponse $ \gen -> do
+    Right signals -> respond $ sseResponse nullLogger $ \gen -> do
       sendPatchSignals gen (patchSignals "{\"generating\": true}")
 
       let loop 0 _ _ = pure ()
@@ -134,7 +134,7 @@ handleEvent status req respond = do
   signalsResult <- readSignals req :: IO (Either String Signals)
   case signalsResult of
     Left err -> respond $ responseLBS status404 [] (LBS.fromStrict $ BS8.pack $ "Bad signals: " <> err)
-    Right signals -> respond $ sseResponse $ \gen -> do
+    Right signals -> respond $ sseResponse nullLogger $ \gen -> do
       let newTotal = _sTotal signals + 1
           counterSignals = case status of
             Done -> "{\"total\": " <> T.pack (show newTotal) <> ", \"done\": " <> T.pack (show (_sDone signals + 1)) <> "}"

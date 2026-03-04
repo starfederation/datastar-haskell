@@ -61,11 +61,11 @@ handleSetDelay state req respond = do
         writeTVar (_delayVar state) (_delay signals)
         v <- readTVar (_versionVar state)
         writeTVar (_versionVar state) (v + 1)
-      respond $ sseResponse $ \_ -> pure ()
+      respond $ sseResponse nullLogger $ \_ -> pure ()
 
 handleHelloWorld :: SharedState -> (Wai.Response -> IO b) -> IO b
 handleHelloWorld state respond =
-  respond $ sseResponse $ \gen ->
+  respond $ sseResponse nullLogger $ \gen ->
     forever $ do
       version <- readTVarIO (_versionVar state)
       d <- readTVarIO (_delayVar state)
