@@ -1,0 +1,3 @@
+packages: .
+
+constraints: memory < 0.18

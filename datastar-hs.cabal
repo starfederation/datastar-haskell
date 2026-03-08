@@ -44,6 +44,30 @@ library
     , text       >= 1.2   && < 3
     , wai        >= 3.2   && < 4
 
+executable e2e-server
+  hs-source-dirs:   e2e-server
+  main-is:          Main.hs
+  build-depends:
+    , base
+    , aeson
+    , bytestring
+    , datastar-hs
+    , http-types
+    , lucid2
+    , text
+    , warp
+    , wai
+  default-language: Haskell2010
+  default-extensions:
+    DeriveGeneric
+    DeriveAnyClass
+    DerivingStrategies
+    ImportQualifiedPost
+    OverloadedStrings
+    ScopedTypeVariables
+  ghc-options: -threaded
+
+
 test-suite datastar-hs-test
   type:             exitcode-stdio-1.0
   hs-source-dirs:   test

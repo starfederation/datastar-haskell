@@ -14,3 +14,5 @@ cradle:
       component: "datastar-hs:exe:activity-feed"
     - path: "examples/heap-view.hs"
       component: "datastar-hs:exe:heap-view"
+    - path: "e2e-server"
+      component: "datastar-hs:exe:e2e-server"
