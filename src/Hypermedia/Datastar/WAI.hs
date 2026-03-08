@@ -55,10 +55,9 @@ import Network.Wai qualified as WAI
 import Hypermedia.Datastar.Types
 
 import Hypermedia.Datastar.ExecuteScript qualified as ES
+import Hypermedia.Datastar.Logger qualified as Logger
 import Hypermedia.Datastar.PatchElements qualified as PE
 import Hypermedia.Datastar.PatchSignals qualified as PS
-import Hypermedia.Datastar.Logger qualified as Logger
-import qualified Hypermedia.Datastar.Logger as Logger
 
 {- | An opaque handle for sending SSE events to the browser.
 
@@ -71,7 +70,7 @@ data ServerSentEventGenerator = ServerSentEventGenerator
   { sseWrite :: BSB.Builder -> IO ()
   , sseFlush :: IO ()
   , sseLock :: MVar ()
-  , sseLogger :: Logger.DatastarLogger 
+  , sseLogger :: Logger.DatastarLogger
   }
 
 {- | Create a WAI 'WAI.Response' that streams SSE events.

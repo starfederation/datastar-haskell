@@ -76,13 +76,14 @@ module Hypermedia.Datastar
   , isDatastarRequest
 
     -- * Logger
-  , DatastarLogger(..)
+  , DatastarLogger (..)
   , nullLogger
   , stderrLogger
   )
 where
 
 import Hypermedia.Datastar.ExecuteScript (ExecuteScript (..), executeScript)
+import Hypermedia.Datastar.Logger (DatastarLogger, nullLogger, stderrLogger)
 import Hypermedia.Datastar.PatchElements (PatchElements (..), patchElements, removeElements)
 import Hypermedia.Datastar.PatchSignals (PatchSignals (..), patchSignals)
 import Hypermedia.Datastar.Types (ElementNamespace (..), ElementPatchMode (..), EventType (..))
@@ -95,4 +96,3 @@ import Hypermedia.Datastar.WAI
   , sendPatchSignals
   , sseResponse
   )
-import Hypermedia.Datastar.Logger (DatastarLogger, nullLogger, stderrLogger)
