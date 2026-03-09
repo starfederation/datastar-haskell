@@ -1,6 +1,6 @@
 cabal-version:   3.0
 name:            datastar-hs
-version:         0.1.0.1
+version:         0.1.0.2
 synopsis:        Haskell bindings for Datastar
 description:
   Server-side SDK for building real-time hypermedia applications with

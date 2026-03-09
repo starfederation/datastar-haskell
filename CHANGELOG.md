@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0.2
+
+* Bump to Datastar RC.8
+* Add end-to-end testing with Playwright
+
 ## 0.1.0.1
 
 * Add example apps: hello-world (warp/servant/channel), activity-feed, heap-view
