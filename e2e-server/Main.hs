@@ -48,7 +48,7 @@ testPage :: LBS.ByteString
 testPage = renderBS $ doctypehtml_ $ do
   head_ $ do
     title_ "datastar-hs e2e tests"
-    script_ [type_ "module", src_ "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"] ("" :: T.Text)
+    script_ [type_ "module", src_ "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"] ("" :: T.Text)
   body_ [makeAttributes "data-signals" "{}"] $ do
     h1_ "datastar-hs E2E Test Page"
 
