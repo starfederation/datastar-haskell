@@ -152,8 +152,9 @@ handler req = do
 -}
 readSignals :: (FromJSON a) => WAI.Request -> IO (Either String a)
 readSignals req
-  | WAI.requestMethod req == "GET" =
-      pure $ parseFromQuery req
+  | WAI.requestMethod req == "GET"
+      || WAI.requestMethod req == "DELETE" =
+          pure $ parseFromQuery req
   | otherwise =
       parseFromBody req
 
