@@ -61,7 +61,7 @@ mkSimpleExpr () = [1, 2, 3, 4, 5] ++ map (* 10) [6, 7, 8]
 {-# NOINLINE mkSimpleExpr #-}
 
 mkMapExpr :: () -> [Int]
-mkMapExpr () = map (* 2) [1 .. 10]
+mkMapExpr () = map (+ 1) [10, 20, 30, 40, 50]
 {-# NOINLINE mkMapExpr #-}
 
 mkFibsExpr :: () -> [Int]
@@ -91,17 +91,17 @@ liveMap :: Mode
 liveMap =
   Mode
     { modeName = "live-map"
-    , modeDesc = "map (*2) [1..10]"
+    , modeDesc = "map (+ 1) [10, 20, 30, 40, 50]"
     , modeSetup = \sess -> do
         let expr = mkMapExpr ()
         atomically $ do
           writeTVar (sessExpression sess) (asBox expr)
-          writeTVar (sessExprDesc sess) "map (*2) [1..10]"
+          writeTVar (sessExprDesc sess) "map (+ 1) [10, 20, 30, 40, 50]"
     , modeRun = Just $ \sess -> do
         let expr = mkMapExpr ()
         atomically $ do
           writeTVar (sessExpression sess) (asBox expr)
-          writeTVar (sessExprDesc sess) "map (*2) [1..10]"
+          writeTVar (sessExprDesc sess) "map (+ 1) [10, 20, 30, 40, 50]"
         _ <- forkIO $ forceListSlowly expr
         pure ()
     }
