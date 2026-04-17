@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0.0
+
+* Bump to Datastar 1.0.0
+* Handle DELETE method in `ReadSignals`
+
 ## 0.1.0.2
 
 * Bump to Datastar RC.8
