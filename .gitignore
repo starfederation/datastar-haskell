@@ -28,3 +28,5 @@ static-build/
 node_modules/
 e2e/test-results/
 e2e/playwright-report/
+
+tmp/

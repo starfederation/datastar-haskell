@@ -25,6 +25,7 @@ source-repository head
 library
   exposed-modules:
     Hypermedia.Datastar
+    Hypermedia.Datastar.Attributes
     Hypermedia.Datastar.ExecuteScript
     Hypermedia.Datastar.Logger
     Hypermedia.Datastar.PatchElements
