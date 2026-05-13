@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1.1
+
+* Revert experimental `examples` sub-library introduced in 1.0.1.0 — it broke Hackage doc uploads. Examples remain in the repo as runnable executables.
+
+## 1.0.1.0
+
+* Add `Hypermedia.Datastar.Attributes` with typed helpers for Datastar `data-*` attributes
+
 ## 1.0.0.0
 
 * Bump to Datastar 1.0.0
