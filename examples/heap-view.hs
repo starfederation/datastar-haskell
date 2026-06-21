@@ -10,7 +10,6 @@ import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as LBS
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
-import Data.Set (Set)
 import Data.Set qualified as Set
 import Data.Text (Text)
 import Data.Text qualified as T
@@ -19,6 +18,9 @@ import Data.UUID qualified as UUID
 import Data.UUID.V4 qualified as UUID
 import GHC.Exts.Heap (Box (..), GenClosure (..), asBox, getClosureData)
 import Hypermedia.Datastar
+import Hypermedia.Datastar.Compression.Brotli (brotli)
+import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
+import Hypermedia.Datastar.Compression.Zstd (zstd)
 import Network.HTTP.Types (queryToQueryText, status200, status400, status404)
 import Network.Wai (Application, Request, Response, pathInfo, queryString, requestMethod, responseLBS)
 import Network.Wai.Handler.Warp qualified as Warp
@@ -463,13 +465,13 @@ main :: IO ()
 main = do
   args <- getArgs
   case args of
-    [name] | Just mode <- lookup name allModes -> startServer 3000 mode
-    [name, portStr] | Just mode <- lookup name allModes -> startServer (read portStr) mode
+    [name'] | Just mode <- lookup name' allModes -> startServer 3000 mode
+    [name', portStr] | Just mode <- lookup name' allModes -> startServer (read portStr) mode
     _ -> do
       hPutStrLn stderr "Usage: heap-view <mode> [port]"
       hPutStrLn stderr ""
       hPutStrLn stderr "Modes:"
-      mapM_ (\(name, mode) -> hPutStrLn stderr $ "  " <> name <> replicate (16 - length name) ' ' <> T.unpack (modeDesc mode)) allModes
+      mapM_ (\(name', mode) -> hPutStrLn stderr $ "  " <> name' <> replicate (16 - length name') ' ' <> T.unpack (modeDesc mode)) allModes
       exitFailure
 
 startServer :: Int -> Mode -> IO ()
@@ -492,14 +494,14 @@ app htmlContent appState req respond =
       respond $ responseLBS status200 [("Content-Type", "text/html")] (LBS.fromStrict htmlContent)
     ("GET", ["heap"]) ->
       withSession appState req respond $ \sess ->
-        handleHeap appState sess respond
+        handleHeap appState sess req respond
     ("GET", ["force"]) ->
       withSession appState req respond $ \sess ->
         handleForce appState sess req respond
     ("GET", ["run"])
       | Just _ <- modeRun (appMode appState) ->
           withSession appState req respond $ \sess ->
-            handleRun appState sess respond
+            handleRun appState sess req respond
     ("GET", ["reset"]) ->
       handleReset appState req respond
     _ ->
@@ -514,9 +516,12 @@ sendHeapUpdate appState sess gen = do
   let html = renderHeapTable (sessId sess) (appHasRun appState) desc rootAddr nodes
   sendPatchElements gen (patchElements html)
 
-handleHeap :: AppState -> Session -> (Response -> IO b) -> IO b
-handleHeap appState sess respond =
-  respond $ sseResponse nullLogger $ \gen ->
+compressors :: [Compressor]
+compressors = [brotli, gzip, deflate, zstd]
+
+handleHeap :: AppState -> Session -> Request -> (Response -> IO b) -> IO b
+handleHeap appState sess req respond =
+  respond $ sseResponseWith nullLogger compressors req $ \gen ->
     sendHeapUpdate appState sess gen
 
 handleForce :: AppState -> Session -> Request -> (Response -> IO b) -> IO b
@@ -525,7 +530,7 @@ handleForce appState sess req respond = do
   case lookup "addr" params of
     Just (Just addr) -> do
       forceThunk sess addr
-      respond $ sseResponse nullLogger $ \gen ->
+      respond $ sseResponseWith nullLogger compressors req $ \gen ->
         sendHeapUpdate appState sess gen
     _ ->
       respond $ responseLBS status400 [] "Missing addr parameter"
@@ -541,15 +546,15 @@ handleReset appState req respond = do
         Nothing -> newSession appState
     Nothing -> newSession appState
   modeSetup (appMode appState) sess
-  respond $ sseResponse nullLogger $ \gen ->
+  respond $ sseResponseWith nullLogger compressors req $ \gen ->
     sendHeapUpdate appState sess gen
 
-handleRun :: AppState -> Session -> (Response -> IO b) -> IO b
-handleRun appState sess respond = do
+handleRun :: AppState -> Session -> Request -> (Response -> IO b) -> IO b
+handleRun appState sess req respond = do
   case modeRun (appMode appState) of
     Just run -> do
       run sess
-      respond $ sseResponse nullLogger $ \gen -> do
+      respond $ sseResponseWith nullLogger compressors req $ \gen -> do
         -- Stream live updates every 200ms for ~12 seconds
         replicateM_ 60 $ do
           sendHeapUpdate appState sess gen

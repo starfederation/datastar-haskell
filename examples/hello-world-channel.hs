@@ -7,6 +7,9 @@ import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as LBS
 import Data.Text qualified as T
 import Hypermedia.Datastar
+import Hypermedia.Datastar.Compression.Brotli (brotli)
+import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
+import Hypermedia.Datastar.Compression.Zstd (zstd)
 import Network.HTTP.Types (status200, status404)
 import Network.Wai (Application, pathInfo, requestMethod, responseLBS)
 import Network.Wai qualified as Wai
@@ -28,6 +31,9 @@ data SharedState = SharedState
 message :: String
 message = "Hello, world!"
 
+compressors :: [Compressor]
+compressors = [brotli, gzip, deflate, zstd]
+
 main :: IO ()
 main = do
   args <- getArgs
@@ -47,7 +53,7 @@ app htmlContent state req respond =
     ("GET", ["set-delay"]) ->
       handleSetDelay state req respond
     ("GET", ["hello-world"]) ->
-      handleHelloWorld state respond
+      handleHelloWorld state req respond
     _ ->
       respond $ responseLBS status404 [] "Not found"
 
@@ -61,11 +67,11 @@ handleSetDelay state req respond = do
         writeTVar (_delayVar state) (_delay signals)
         v <- readTVar (_versionVar state)
         writeTVar (_versionVar state) (v + 1)
-      respond $ sseResponse nullLogger $ \_ -> pure ()
+      respond $ sseResponseWith nullLogger compressors req $ \_ -> pure ()
 
-handleHelloWorld :: SharedState -> (Wai.Response -> IO b) -> IO b
-handleHelloWorld state respond =
-  respond $ sseResponse nullLogger $ \gen ->
+handleHelloWorld :: SharedState -> Wai.Request -> (Wai.Response -> IO b) -> IO b
+handleHelloWorld state req respond =
+  respond $ sseResponseWith nullLogger compressors req $ \gen ->
     forever $ do
       version <- readTVarIO (_versionVar state)
       d <- readTVarIO (_delayVar state)

@@ -1,3 +1,12 @@
 packages: .
 
 constraints: memory < 0.18
+
+-- hs-zstd: pinned to an unreleased commit with the streaming FFI binding
+-- for flushStream; revert to Hackage once published.
+--
+-- https://github.com/starfederation/datastar-haskell/issues/3
+source-repository-package
+  type: git
+  location: https://github.com/luispedro/hs-zstd
+  tag: 59c0d21ab65a6296e06446c8368d78b9b4c7e64d

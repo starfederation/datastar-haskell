@@ -47,7 +47,13 @@ import Data.Text.Encoding qualified as TE
 import Data.Aeson (FromJSON)
 import Data.Aeson qualified as A
 
+import Data.ByteString qualified as BS
 import Data.ByteString.Builder qualified as BSB
+import Data.ByteString.Char8 qualified as BS8
+
+import           Data.List  (find)
+import           Data.Maybe (listToMaybe)
+
 
 import Network.HTTP.Types qualified as WAI
 import Network.Wai qualified as WAI
@@ -58,6 +64,74 @@ import Hypermedia.Datastar.ExecuteScript qualified as ES
 import Hypermedia.Datastar.Logger qualified as Logger
 import Hypermedia.Datastar.PatchElements qualified as PE
 import Hypermedia.Datastar.PatchSignals qualified as PS
+data Compressor = Compressor 
+  { compressorEncoding :: BS.ByteString
+  -- ^ The @Content-Encoding@ token, e.g. @"br"@ for Brotli compression.
+
+  , compressorWrap :: (BSB.Builder -> IO ())
+                   -> IO ()
+                   -> IO (BSB.Builder -> IO (), IO (), IO ())
+  -- ^ @compressorWrap rawWrite rawFlush@ returns @(write, flush, finish)@.
+  --
+  -- * @write@ compresses and forwards bytes for an event;
+  -- * @flush@ flushes the compression encoded and then the underlying raw transport;
+  -- * @finish@ closes the compression stream.
+  }
+
+data CompressionStrategy
+  = ServerPriority
+  | ClientPriority
+  | Forced
+  deriving (Eq, Show)
+
+-- | Faithful port of the Go reference parser: split on ',', trim surrounding
+-- whitespace, take the token before ';', drop empties. No q-value handling,
+-- no case folding, no wildcard logic.
+parseEncodings :: BS.ByteString -> [BS.ByteString]
+parseEncodings header =
+  [ token
+  | part <- BS8.split ',' header
+  , let token = BS8.takeWhile (/= ';') (strip part)
+  , not (BS8.null token)
+  ]
+  where
+    strip   = BS8.dropWhile isOWS . BS8.dropWhileEnd isOWS
+    isOWS c = c == ' ' || c == '\t'
+
+-- | The encoding tokens of a request's @Accept-Encoding@ header, in order.
+-- An absent or empty header yields [].
+clientEncodings :: WAI.Request -> [BS.ByteString]
+clientEncodings req 
+  = maybe
+     [] 
+     parseEncodings
+     (lookup WAI.hAcceptEncoding $ WAI.requestHeaders req)
+
+{- | Pick a compressor for a request's @Accept-Encoding@ header using the given
+'CompressionStrategy', or 'Nothing' if none applies. Token matching is exact
+(case-sensitive), mirroring the Go reference.
+-}
+negotiateWith :: CompressionStrategy -> [Compressor] -> WAI.Request -> Maybe Compressor
+negotiateWith strategy compressors req =
+  case strategy of
+    ServerPriority ->
+      -- first server compressor whose token the client sent
+      find (\c -> compressorEncoding c `elem` accepted) compressors
+
+    ClientPriority ->
+      -- first client token (header order) that the server offers
+      listToMaybe
+        [ c
+        | enc <- accepted
+        , c   <- compressors
+        , compressorEncoding c == enc
+        ]
+
+    Forced ->
+      -- first configured compressor, regardless of Accept-Encoding
+      listToMaybe compressors
+  where
+    accepted = clientEncodings req
 
 {- | An opaque handle for sending SSE events to the browser.
 
@@ -86,7 +160,32 @@ app req respond =
 @
 -}
 sseResponse :: Logger.DatastarLogger -> (ServerSentEventGenerator -> IO ()) -> WAI.Response
-sseResponse logger callback =
+sseResponse logger = sseResponse' logger Nothing
+
+sseResponseWith
+  :: Logger.DatastarLogger
+  -> [Compressor]
+  -> WAI.Request
+  -> (ServerSentEventGenerator -> IO ())
+  -> WAI.Response
+sseResponseWith = sseResponseWithStrategy ServerPriority
+
+sseResponseWithStrategy
+  :: CompressionStrategy
+  -> Logger.DatastarLogger
+  -> [Compressor]
+  -> WAI.Request
+  -> (ServerSentEventGenerator -> IO ())
+  -> WAI.Response
+sseResponseWithStrategy strategy logger compressors req =
+  sseResponse' logger (negotiateWith strategy compressors req)
+
+sseResponse'
+  :: Logger.DatastarLogger
+  -> Maybe Compressor
+  -> (ServerSentEventGenerator -> IO ())
+  -> WAI.Response
+sseResponse' logger chosen callback =
   WAI.responseStream
     WAI.status200
     headers
@@ -97,16 +196,29 @@ sseResponse logger callback =
     , ("Content-Type", "text/event-stream")
     , ("Connection", "keep-alive")
     ]
+      <> case chosen of
+        Just c -> [("Content-Encoding", compressorEncoding c)]
+        Nothing -> []
 
-  action write flush = do
+  action rawWrite rawFlush = do
+    (write, flush, finish) <- case chosen of
+      Nothing -> pure (rawWrite, rawFlush, pure ())
+      Just c -> compressorWrap c rawWrite rawFlush
     lock <- newMVar ()
-    callback $
-      ServerSentEventGenerator
-        { sseWrite = write
-        , sseFlush = flush
-        , sseLock = lock
-        , sseLogger = logger
-        }
+    let gen =
+          ServerSentEventGenerator
+            { sseWrite = write
+            , sseFlush = flush
+            , sseLock = lock
+            , sseLogger = logger
+            }
+    callback gen `finally` ignoreIOErrors finish
+
+ignoreIOErrors :: IO () -> IO ()
+ignoreIOErrors act = act `catch` handler
+ where
+  handler :: IOException -> IO ()
+  handler _ = pure ()
 
 send :: ServerSentEventGenerator -> DatastarEvent -> IO ()
 send gen event = do

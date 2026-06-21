@@ -34,12 +34,33 @@ main :: IO ()
 main = Warp.run 3000 app
 @
 
+=== With compression
+
+Use 'sseResponseWith' to negotiate a @Content-Encoding@ from the request's
+@Accept-Encoding@ header. Pass the compressors you want to offer, in
+preference order — the first one the client accepts wins:
+
+@
+import Hypermedia.Datastar
+import Hypermedia.Datastar.Compression.Brotli (brotli)
+import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
+
+app req respond =
+  respond $ sseResponseWith nullLogger [brotli, gzip, deflate] req $ \\gen ->
+    sendPatchElements gen (patchElements \"\<div id=\\\"msg\\\"\>Hello!\<\/div\>\")
+@
+
+If the client accepts none of them, the stream is sent uncompressed. Use
+'sseResponseWithStrategy' to control negotiation with a 'CompressionStrategy'
+(e.g. prefer the client's order, or force a single encoding).
+
 === Module guide
 
 * "Hypermedia.Datastar.PatchElements" — send HTML to morph into the DOM
 * "Hypermedia.Datastar.PatchSignals" — update the browser's reactive signals
 * "Hypermedia.Datastar.ExecuteScript" — run JavaScript in the browser
 * "Hypermedia.Datastar.WAI" — SSE streaming, signal decoding, request helpers
+* "Hypermedia.Datastar.Compression.Brotli", "Hypermedia.Datastar.Compression.Zlib" — @Content-Encoding@ compressors
 * "Hypermedia.Datastar.Types" — protocol types and defaults
 
 === Further reading
@@ -75,8 +96,19 @@ module Hypermedia.Datastar
   , readSignals
   , isDatastarRequest
 
+    -- * Compression
+    --
+    -- | Negotiate @Content-Encoding@ for an SSE stream. Pass one or more
+    -- compressors from "Hypermedia.Datastar.Compression.Brotli" or
+    -- "Hypermedia.Datastar.Compression.Zlib". 'sseResponseWith' uses
+    -- 'ServerPriority'; 'sseResponseWithStrategy' lets you choose.
+  , Compressor
+  , CompressionStrategy (..)
+  , sseResponseWith
+  , sseResponseWithStrategy
+
     -- * Logger
-  , DatastarLogger (..)
+  , DatastarLogger
   , nullLogger
   , stderrLogger
   )
@@ -88,11 +120,15 @@ import Hypermedia.Datastar.PatchElements (PatchElements (..), patchElements, rem
 import Hypermedia.Datastar.PatchSignals (PatchSignals (..), patchSignals)
 import Hypermedia.Datastar.Types (ElementNamespace (..), ElementPatchMode (..), EventType (..))
 import Hypermedia.Datastar.WAI
-  ( ServerSentEventGenerator
+  ( CompressionStrategy (..)
+  , Compressor
+  , ServerSentEventGenerator
   , isDatastarRequest
   , readSignals
   , sendExecuteScript
   , sendPatchElements
   , sendPatchSignals
   , sseResponse
+  , sseResponseWith
+  , sseResponseWithStrategy
   )

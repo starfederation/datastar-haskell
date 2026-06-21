@@ -6,11 +6,17 @@ import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as LBS
 import Data.Text qualified as T
 import Hypermedia.Datastar
+import Hypermedia.Datastar.Compression.Brotli (brotli)
+import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
+import Hypermedia.Datastar.Compression.Zstd (zstd)
 import Network.HTTP.Types (status200, status404)
 import Network.Wai (Application, pathInfo, requestMethod, responseLBS)
 import Network.Wai qualified as Wai
 import Network.Wai.Handler.Warp qualified as Warp
 import System.Environment (getArgs)
+
+compressors :: [Compressor]
+compressors = [brotli, gzip, deflate, zstd]
 
 newtype Signals = Signals {delay :: Int}
 
@@ -46,7 +52,7 @@ handleHelloWorld req respond = do
   signalsResult <- readSignals req :: IO (Either String Signals)
   case signalsResult of
     Left _ -> respond $ responseLBS status404 [] "Bad signals"
-    Right signals -> respond $ sseResponse nullLogger $ \gen ->
+    Right signals -> respond $ sseResponseWith nullLogger compressors req $ \gen ->
       mapM_
         ( \i -> do
             let html = "<div id='message'>" <> T.pack (take i message) <> "</div>"

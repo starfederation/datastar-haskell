@@ -6,6 +6,9 @@ import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as LBS
 import Data.Text qualified as T
 import Hypermedia.Datastar
+import Hypermedia.Datastar.Compression.Brotli (brotli)
+import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
+import Hypermedia.Datastar.Compression.Zstd (zstd)
 import Network.HTTP.Media ((//))
 import Network.HTTP.Types (status404)
 import Network.Wai qualified as Wai
@@ -30,6 +33,9 @@ instance FromJSON Signals where
 message :: String
 message = "Hello, world!"
 
+compressors :: [Compressor]
+compressors = [brotli, gzip, deflate, zstd]
+
 type API =
   Get '[HTML] LBS.ByteString
     :<|> "hello-world" :> Raw
@@ -44,11 +50,11 @@ serveIndex htmlContent =
   pure $ LBS.fromStrict htmlContent
 
 serveHelloWorld :: Tagged Handler Application
-serveHelloWorld = Tagged $ \req respond -> do
+serveHelloWorld = Tagged $ \req respond' -> do
   signalsResult <- readSignals req :: IO (Either String Signals)
   case signalsResult of
-    Left _ -> respond $ Wai.responseLBS status404 [] "Bad signals"
-    Right signals -> respond $ sseResponse nullLogger $ \gen ->
+    Left _ -> respond' $ Wai.responseLBS status404 [] "Bad signals"
+    Right signals -> respond' $ sseResponseWith nullLogger compressors req $ \gen ->
       mapM_
         ( \i -> do
             let html = "<div id='message'>" <> T.pack (take i message) <> "</div>"
