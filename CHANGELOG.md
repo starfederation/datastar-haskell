@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2.1
+
+* Fix the `zstd` ratio in the `compression-bench` output (it reported brotli's
+  ratio by mistake) and correct the benchmark numbers in the README. No library
+  changes.
+
 ## 1.0.2.0
 
 * Add SSE response compression with `Content-Encoding` negotiation:
