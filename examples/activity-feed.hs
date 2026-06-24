@@ -10,6 +10,8 @@ import Data.Text qualified as T
 import Data.Time.Clock (getCurrentTime)
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Hypermedia.Datastar
+import Hypermedia.Datastar.Compression.Brotli (brotli)
+import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
 import Network.HTTP.Types (status200, status404)
 import Network.Wai (Application, pathInfo, requestMethod, responseLBS)
 import Network.Wai qualified as Wai
@@ -104,12 +106,15 @@ app htmlContent req respond =
     _ ->
       respond $ responseLBS status404 [] "Not found"
 
+compressors :: [Compressor]
+compressors = [brotli, gzip, deflate]
+
 handleGenerate :: Wai.Request -> (Wai.Response -> IO b) -> IO b
 handleGenerate req respond = do
   signalsResult <- readSignals req :: IO (Either String Signals)
   case signalsResult of
     Left err -> respond $ responseLBS status404 [] (LBS.fromStrict $ BS8.pack $ "Bad signals: " <> err)
-    Right signals -> respond $ sseResponse nullLogger $ \gen -> do
+    Right signals -> respond $ sseResponseWith nullLogger compressors req $ \gen -> do
       sendPatchSignals gen (patchSignals "{\"generating\": true}")
 
       let loop 0 _ _ = pure ()
@@ -134,7 +139,7 @@ handleEvent status req respond = do
   signalsResult <- readSignals req :: IO (Either String Signals)
   case signalsResult of
     Left err -> respond $ responseLBS status404 [] (LBS.fromStrict $ BS8.pack $ "Bad signals: " <> err)
-    Right signals -> respond $ sseResponse nullLogger $ \gen -> do
+    Right signals -> respond $ sseResponseWith nullLogger compressors req $ \gen -> do
       let newTotal = _sTotal signals + 1
           counterSignals = case status of
             Done -> "{\"total\": " <> T.pack (show newTotal) <> ", \"done\": " <> T.pack (show (_sDone signals + 1)) <> "}"

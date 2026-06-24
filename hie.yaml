@@ -16,3 +16,5 @@ cradle:
       component: "datastar-hs:exe:heap-view"
     - path: "e2e-server"
       component: "datastar-hs:exe:e2e-server"
+    - path: "bench"
+      component: "datastar-hs:exe:compression-bench"
