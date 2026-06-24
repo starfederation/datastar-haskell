@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.2.0
+
+* Add SSE response compression with `Content-Encoding` negotiation:
+  * `sseResponseWith` and `sseResponseWithStrategy`, plus `Compressor` and
+    `CompressionStrategy` (`ServerPriority`, `ClientPriority`, `Forced`) — all
+    re-exported from `Hypermedia.Datastar`
+  * `Hypermedia.Datastar.Compression.Brotli` (`brotli`)
+  * `Hypermedia.Datastar.Compression.Zlib` (`gzip`, `deflate`)
+  * `Hypermedia.Datastar.Compression.Zstd` (`zstd`) — opt-in behind the `zstd`
+    cabal flag (off by default), as it needs an unreleased `hs-zstd`
+    ([#3](https://github.com/starfederation/datastar-haskell/issues/3))
+* Add a `compression-bench` executable for measuring compression ratios
+* Enable stricter GHC warnings (`-Wall` and friends) across all components
+
 ## 1.0.1.1
 
 * Revert experimental `examples` sub-library introduced in 1.0.1.0 — it broke Hackage doc uploads. Examples remain in the repo as runnable executables.

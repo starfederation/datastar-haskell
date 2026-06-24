@@ -2,6 +2,11 @@ packages: .
 
 constraints: memory < 0.18
 
+-- Build the zstd compressor locally (the library flag is off by default so the
+-- Hackage build stays clean). Relies on the source-repository-package pin below.
+package datastar-hs
+  flags: +zstd
+
 -- hs-zstd: pinned to an unreleased commit with the streaming FFI binding
 -- for flushStream; revert to Hackage once published.
 --

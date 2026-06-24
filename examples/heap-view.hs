@@ -20,7 +20,6 @@ import GHC.Exts.Heap (Box (..), GenClosure (..), asBox, getClosureData)
 import Hypermedia.Datastar
 import Hypermedia.Datastar.Compression.Brotli (brotli)
 import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
-import Hypermedia.Datastar.Compression.Zstd (zstd)
 import Network.HTTP.Types (queryToQueryText, status200, status400, status404)
 import Network.Wai (Application, Request, Response, pathInfo, queryString, requestMethod, responseLBS)
 import Network.Wai.Handler.Warp qualified as Warp
@@ -517,7 +516,7 @@ sendHeapUpdate appState sess gen = do
   sendPatchElements gen (patchElements html)
 
 compressors :: [Compressor]
-compressors = [brotli, gzip, deflate, zstd]
+compressors = [brotli, gzip, deflate]
 
 handleHeap :: AppState -> Session -> Request -> (Response -> IO b) -> IO b
 handleHeap appState sess req respond =

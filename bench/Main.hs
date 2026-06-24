@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 {- |
 A size benchmark for Datastar SSE compression.
 
@@ -24,7 +26,9 @@ import Network.Wai.Internal (Response (..))
 import Hypermedia.Datastar
 import Hypermedia.Datastar.Compression.Brotli (brotli)
 import Hypermedia.Datastar.Compression.Zlib (gzip)
+#ifdef ZSTD
 import Hypermedia.Datastar.Compression.Zstd (zstd)
+#endif
 
 wireBytes :: Response -> IO Int
 wireBytes (ResponseStream _ _ body) = do
@@ -57,14 +61,16 @@ bench name frags = do
   rawN <- rawBytes frags
   gzN <- compressedBytes gzip frags
   brN <- compressedBytes brotli frags
-  zstdN <- compressedBytes zstd frags
 
   printf "\n=== %s ===\n" name
   printf "  %d events, ~%s uncompressed per fragment\n\n" n (human perEvent)
   printf "  none   : %12s\n" (human rawN)
   printf "  gzip   : %12s  (%7.1fx vs none)\n" (human gzN) (ratio rawN gzN)
   printf "  brotli : %12s  (%7.1fx vs none)\n" (human brN) (ratio rawN brN)
-  printf "  zstd   : %12s  (%7.1fx vs none)\n" (human zstdN) (ratio rawN brN)
+#ifdef ZSTD
+  zstdN <- compressedBytes zstd frags
+  printf "  zstd   : %12s  (%7.1fx vs none)\n" (human zstdN) (ratio rawN zstdN)
+#endif
 
 ratio :: Int -> Int -> Double
 ratio a b = if b == 0 then 0 else fromIntegral a / fromIntegral b

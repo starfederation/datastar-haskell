@@ -12,7 +12,6 @@ import Data.Time.Format (defaultTimeLocale, formatTime)
 import Hypermedia.Datastar
 import Hypermedia.Datastar.Compression.Brotli (brotli)
 import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
-import Hypermedia.Datastar.Compression.Zstd (zstd)
 import Network.HTTP.Types (status200, status404)
 import Network.Wai (Application, pathInfo, requestMethod, responseLBS)
 import Network.Wai qualified as Wai
@@ -108,7 +107,7 @@ app htmlContent req respond =
       respond $ responseLBS status404 [] "Not found"
 
 compressors :: [Compressor]
-compressors = [brotli, gzip, deflate, zstd]
+compressors = [brotli, gzip, deflate]
 
 handleGenerate :: Wai.Request -> (Wai.Response -> IO b) -> IO b
 handleGenerate req respond = do

@@ -8,7 +8,6 @@ import Data.Text qualified as T
 import Hypermedia.Datastar
 import Hypermedia.Datastar.Compression.Brotli (brotli)
 import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
-import Hypermedia.Datastar.Compression.Zstd (zstd)
 import Network.HTTP.Types (status200, status404)
 import Network.Wai (Application, pathInfo, requestMethod, responseLBS)
 import Network.Wai qualified as Wai
@@ -16,7 +15,7 @@ import Network.Wai.Handler.Warp qualified as Warp
 import System.Environment (getArgs)
 
 compressors :: [Compressor]
-compressors = [brotli, gzip, deflate, zstd]
+compressors = [brotli, gzip, deflate]
 
 newtype Signals = Signals {delay :: Int}
 
