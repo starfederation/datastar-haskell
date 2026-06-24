@@ -104,7 +104,7 @@ a large blob with small changes.
   none   :      51.1 MB
   gzip   :       4.0 MB  (   12.8x vs none)
   brotli :       9.0 KB  ( 5779.1x vs none)
-  zstd   :      13.6 KB  ( 5779.1x vs none)
+  zstd   :      13.6 KB  ( 3854.3x vs none)
 
 === Fat update: large grid, only the caption changes each tick ===
   400 events, ~130.7 KB uncompressed per fragment
@@ -112,7 +112,7 @@ a large blob with small changes.
   none   :      51.1 MB
   gzip   :       4.0 MB  (   12.7x vs none)
   brotli :       9.9 KB  ( 5265.5x vs none)
-  zstd   :      19.4 KB  ( 5265.5x vs none)
+  zstd   :      19.4 KB  ( 2697.3x vs none)
 
 === Small update: tiny clock div each tick ===
   400 events, ~23 B uncompressed per fragment
@@ -120,7 +120,7 @@ a large blob with small changes.
   none   :      28.4 KB
   gzip   :       4.4 KB  (    6.5x vs none)
   brotli :       4.8 KB  (    6.0x vs none)
-  zstd   :       5.2 KB  (    6.0x vs none)
+  zstd   :       5.2 KB  (    5.5x vs none)
 ```
 
 ### zstd upstream package
