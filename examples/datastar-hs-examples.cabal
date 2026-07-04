@@ -1,0 +1,124 @@
+cabal-version:   3.0
+name:            datastar-hs-examples
+version:         1.1.0.0
+synopsis:        Example servers for datastar-hs (not released to Hackage)
+license:         MIT
+author:          Carlo Hamalainen
+maintainer:      carlo@carlo-hamalainen.net
+category:        Web, Hypermedia
+build-type:      Simple
+
+common warnings
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Wunused-packages
+    -Wredundant-constraints
+    -Wincomplete-uni-patterns
+    -Wincomplete-record-updates
+
+executable hello-world-warp
+  import: warnings
+  main-is:          hello-world-warp.hs
+  default-language:  Haskell2010
+  default-extensions:
+    ImportQualifiedPost
+    OverloadedStrings
+  build-depends:
+    , base >= 4.7
+    , aeson
+    , bytestring
+    , http-types
+    , text
+    , wai
+    , warp              >= 3.2   && < 4
+    , datastar-hs
+    , datastar-hs-zlib
+  ghc-options: -threaded
+
+executable hello-world-servant
+  import: warnings
+  main-is:          hello-world-servant.hs
+  default-language:  Haskell2010
+  default-extensions:
+    DataKinds
+    ImportQualifiedPost
+    MultiParamTypeClasses
+    OverloadedStrings
+    TypeOperators
+  build-depends:
+    , base >= 4.7
+    , aeson
+    , bytestring
+    , http-media        >= 0.8   && < 1
+    , http-types
+    , servant-server    >= 0.19  && < 1
+    , text
+    , wai
+    , warp              >= 3.2   && < 4
+    , datastar-hs
+    , datastar-hs-zlib
+  ghc-options: -threaded
+
+executable hello-world-channel
+  import: warnings
+  main-is:          hello-world-channel.hs
+  default-language:  Haskell2010
+  default-extensions:
+    ImportQualifiedPost
+    OverloadedStrings
+  build-depends:
+    , base >= 4.7
+    , aeson
+    , bytestring
+    , http-types
+    , stm               >= 2.4   && < 3
+    , text
+    , wai
+    , warp              >= 3.2   && < 4
+    , datastar-hs
+    , datastar-hs-zlib
+  ghc-options: -threaded
+
+executable activity-feed
+  import: warnings
+  main-is:          activity-feed.hs
+  default-language:  Haskell2010
+  default-extensions:
+    ImportQualifiedPost
+    OverloadedStrings
+  build-depends:
+    , base >= 4.7
+    , aeson
+    , bytestring
+    , text
+    , time              >= 1.9   && < 2
+    , http-types
+    , wai
+    , warp              >= 3.2   && < 4
+    , datastar-hs
+    , datastar-hs-zlib
+  ghc-options: -threaded
+
+executable heap-view
+  import: warnings
+  main-is:          heap-view.hs
+  default-language:  Haskell2010
+  default-extensions:
+    ImportQualifiedPost
+    OverloadedStrings
+    ScopedTypeVariables
+  build-depends:
+    , base >= 4.7
+    , bytestring
+    , containers        >= 0.6   && < 1
+    , ghc-heap          >= 9.0   && < 10
+    , http-types
+    , stm               >= 2.4   && < 3
+    , text
+    , uuid              >= 1.3   && < 2
+    , wai
+    , warp              >= 3.2   && < 4
+    , datastar-hs
+    , datastar-hs-zlib
+  ghc-options: -threaded -O0

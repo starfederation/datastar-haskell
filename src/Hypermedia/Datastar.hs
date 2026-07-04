@@ -36,14 +36,17 @@ main = Warp.run 3000 app
 
 === With compression
 
-Use 'sseResponseWith' to negotiate a @Content-Encoding@ from the request's
-@Accept-Encoding@ header. Pass the compressors you want to offer, in
-preference order — the first one the client accepts wins:
+Compressors live in add-on packages so this core package needs no system C
+libraries: @datastar-hs-zlib@ (gzip, deflate), @datastar-hs-brotli@ (br), and
+@datastar-hs-zstd@ (zstd). Use 'sseResponseWith' to negotiate a
+@Content-Encoding@ from the request's @Accept-Encoding@ header. Pass the
+compressors you want to offer, in preference order — the first one the client
+accepts wins:
 
 @
 import Hypermedia.Datastar
-import Hypermedia.Datastar.Compression.Brotli (brotli)
-import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
+import Hypermedia.Datastar.Compression.Brotli (brotli)       -- datastar-hs-brotli
+import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)  -- datastar-hs-zlib
 
 app req respond =
   respond $ sseResponseWith nullLogger [brotli, gzip, deflate] req $ \\gen ->
@@ -60,8 +63,8 @@ If the client accepts none of them, the stream is sent uncompressed. Use
 * "Hypermedia.Datastar.PatchSignals" — update the browser's reactive signals
 * "Hypermedia.Datastar.ExecuteScript" — run JavaScript in the browser
 * "Hypermedia.Datastar.WAI" — SSE streaming, signal decoding, request helpers
-* "Hypermedia.Datastar.Compression.Brotli", "Hypermedia.Datastar.Compression.Zlib" — @Content-Encoding@ compressors
 * "Hypermedia.Datastar.Types" — protocol types and defaults
+* @Hypermedia.Datastar.Compression.*@ — @Content-Encoding@ compressors, in the add-on packages @datastar-hs-zlib@, @datastar-hs-brotli@, and @datastar-hs-zstd@
 
 === Further reading
 
@@ -99,8 +102,8 @@ module Hypermedia.Datastar
     -- * Compression
     --
     -- | Negotiate @Content-Encoding@ for an SSE stream. Pass one or more
-    -- compressors from "Hypermedia.Datastar.Compression.Brotli" or
-    -- "Hypermedia.Datastar.Compression.Zlib". 'sseResponseWith' uses
+    -- compressors from the add-on packages @datastar-hs-zlib@,
+    -- @datastar-hs-brotli@, or @datastar-hs-zstd@. 'sseResponseWith' uses
     -- 'ServerPriority'; 'sseResponseWithStrategy' lets you choose.
   , Compressor
   , CompressionStrategy (..)

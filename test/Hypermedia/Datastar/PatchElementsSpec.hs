@@ -82,22 +82,22 @@ spec = describe "Hypermedia.Datastar.PatchElements.toDatastarEvent" $ do
                  ]
 
   it "omits namespace when html (default)" $ do
-    let lines =
+    let lines' =
           dataLines $
             toDatastarEvent $
               patchElements "<p>hello</p>"
 
-    any (T.isPrefixOf "namespace") lines `shouldBe` False
+    any (T.isPrefixOf "namespace") lines' `shouldBe` False
 
   it "omits mode when Outer (default)" $ do
     let pe = patchElements "<p>hello</p>"
         event = toDatastarEvent pe
-        lines = dataLines event
-    any (T.isPrefixOf "mode") lines `shouldBe` False
+        lines' = dataLines event
+    any (T.isPrefixOf "mode") lines' `shouldBe` False
 
   it "politely ignores empty element strings" $ do
-    let lines =
+    let lines' =
           dataLines $
             toDatastarEvent $
               patchElements ""
-    lines `shouldBe` []
+    lines' `shouldBe` []

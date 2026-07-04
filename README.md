@@ -21,8 +21,11 @@ with any WAI-compatible server (Warp, etc.) and any framework built on WAI
 
 Key design decisions:
 
-- **Minimal dependencies** -- the library depends only on `aeson`, `bytestring`,
-`http-types`, `text`, `wai`, and some compression libraries.
+- **No system libraries** -- the core library depends only on `aeson`,
+`bytestring`, `http-types`, `text`, and `wai`. A machine with just GHC (e.g. a
+fresh [ghcup](https://www.haskell.org/ghcup/) install) builds it; no
+`apt-get`/`brew` needed. Compressors that link against C libraries live in
+add-on packages (see [Compression](#compression)).
 - **WAI streaming** -- SSE responses use WAI's native `responseStream`, giving
 you a `ServerSentEventGenerator` callback with `sendPatchElements`,
 `sendPatchSignals`, and `sendExecuteScript`.
@@ -73,16 +76,23 @@ main = Warp.run 3000 app
 ## Compression
 
 SSE streams can be compressed by negotiating `Content-Encoding` against the
-request's `Accept-Encoding`. Pass one or more compressors to `sseResponseWith`
+request's `Accept-Encoding`. The compressors live in add-on packages so that
+the core `datastar-hs` has no system-library dependencies:
+
+| Package | Encodings | System library |
+|---|---|---|
+| `datastar-hs-zlib` | `gzip`, `deflate` | zlib -- preinstalled on macOS; `zlib1g-dev` on Debian/Ubuntu, or build with the constraint `zlib +bundled-c-zlib` for no system library at all |
+| `datastar-hs-brotli` | `br` | `brew install brotli` / `apt-get install libbrotli-dev pkg-config` |
+| `datastar-hs-zstd` | `zstd` | `brew install zstd` / `apt-get install libzstd-dev` -- not yet on Hackage, see below |
+
+Add one to `build-depends` and pass its compressors to `sseResponseWith`
 (or `sseResponseWithStrategy`) in preference order:
 
 ```haskell
 import Hypermedia.Datastar
-import Hypermedia.Datastar.Compression.Brotli (brotli)
-import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
-import Hypermedia.Datastar.Compression.Zstd (zstd)
+import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)  -- datastar-hs-zlib
 
-respond $ sseResponseWith nullLogger [brotli, gzip, deflate] req $ \gen ->
+respond $ sseResponseWith nullLogger [gzip, deflate] req $ \gen ->
   sendPatchElements gen (patchElements "<div id=\"message\">Hello!</div>")
 ```
 
