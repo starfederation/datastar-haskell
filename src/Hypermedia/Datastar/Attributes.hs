@@ -1,30 +1,32 @@
--- | Smart constructors and modifier combinators for Datastar HTML attributes.
---
--- Every Datastar attribute is a @(name, value)@ pair — the value of the
--- 'Attribute' type alias. Pair it with whatever HTML library you use:
---
--- > -- lucid2:
--- > button_ [ uncurry makeAttributes (onClick "$count++") ] "Inc"
---
--- Modifiers (the @__suffix@ parts of an attribute name) are plain
--- @Attribute -> Attribute@ functions you compose with '(.)' or '(&)':
---
--- > import Data.Function ((&))
--- > onInput "@get('/search')"
--- >   & debounce 200
--- >   & prevent
--- > -- => ("data-on:input__debounce.200ms__prevent", "@get('/search')")
---
--- For an event the library doesn't have a shortcut for, 'dataOn' takes any
--- 'Text':
---
--- > dataOn "my-custom-event" "..."
+{- | Smart constructors and modifier combinators for Datastar HTML attributes.
+
+Every Datastar attribute is a @(name, value)@ pair — the value of the
+'Attribute' type alias. Pair it with whatever HTML library you use:
+
+> -- lucid2:
+> button_ [ uncurry makeAttributes (onClick "$count++") ] "Inc"
+
+Modifiers (the @__suffix@ parts of an attribute name) are plain
+@Attribute -> Attribute@ functions you compose with '(.)' or '(&)':
+
+> import Data.Function ((&))
+> onInput "@get('/search')"
+>   & debounce 200
+>   & prevent
+> -- => ("data-on:input__debounce.200ms__prevent", "@get('/search')")
+
+For an event the library doesn't have a shortcut for, 'dataOn' takes any
+'Text':
+
+> dataOn "my-custom-event" "..."
+-}
 module Hypermedia.Datastar.Attributes
   ( -- * The attribute pair
     Attribute
 
     -- * Event handlers
   , dataOn
+
     -- ** Common event shortcuts
   , onClick
   , onSubmit
@@ -98,6 +100,7 @@ module Hypermedia.Datastar.Attributes
   , dataPreserveAttr
 
     -- * Modifier combinators
+
     -- ** Event flags
   , prevent
   , stop
@@ -108,28 +111,34 @@ module Hypermedia.Datastar.Attributes
   , document_
   , outside
   , viewTransition
+
     -- ** Timing
   , debounce
   , debounceWith
   , throttle
   , throttleWith
   , delay
+
     -- ** Casing
   , camelCase
   , kebabCase
   , snakeCase
   , pascalCase
+
     -- ** on-intersect
   , full
   , half
   , threshold
   , exit
+
     -- ** on-interval
   , duration
   , durationWith
+
     -- ** bind
   , bindProp
   , bindEvents
+
     -- ** signals \/ json-signals \/ ignore
   , ifMissing
   , terse
@@ -158,53 +167,60 @@ type Attribute = (Text, Text)
 -- Event handlers
 -- ---------------------------------------------------------------------------
 
--- | @data-on:\<event\>="\<expr\>"@. Use the shortcuts below for common events,
--- or call directly for custom events (e.g. @dataOn \"my-custom-event\" ...@).
+{- | @data-on:\<event\>="\<expr\>"@. Use the shortcuts below for common events,
+or call directly for custom events (e.g. @dataOn \"my-custom-event\" ...@).
+-}
 dataOn :: Text -> Text -> Attribute
 dataOn ev expr = ("data-on:" <> ev, expr)
 
 onClick, onSubmit, onInput, onChange, onFocus, onBlur :: Text -> Attribute
-onClick  = dataOn "click"
+onClick = dataOn "click"
 onSubmit = dataOn "submit"
-onInput  = dataOn "input"
+onInput = dataOn "input"
 onChange = dataOn "change"
-onFocus  = dataOn "focus"
-onBlur   = dataOn "blur"
+onFocus = dataOn "focus"
+onBlur = dataOn "blur"
 
 onKeyDown, onKeyUp, onKeyPress :: Text -> Attribute
-onKeyDown  = dataOn "keydown"
-onKeyUp    = dataOn "keyup"
+onKeyDown = dataOn "keydown"
+onKeyUp = dataOn "keyup"
 onKeyPress = dataOn "keypress"
 
-onMouseDown, onMouseUp, onMouseMove,
-  onMouseEnter, onMouseLeave, onMouseOver, onMouseOut :: Text -> Attribute
-onMouseDown  = dataOn "mousedown"
-onMouseUp    = dataOn "mouseup"
-onMouseMove  = dataOn "mousemove"
+onMouseDown
+  , onMouseUp
+  , onMouseMove
+  , onMouseEnter
+  , onMouseLeave
+  , onMouseOver
+  , onMouseOut
+    :: Text -> Attribute
+onMouseDown = dataOn "mousedown"
+onMouseUp = dataOn "mouseup"
+onMouseMove = dataOn "mousemove"
 onMouseEnter = dataOn "mouseenter"
 onMouseLeave = dataOn "mouseleave"
-onMouseOver  = dataOn "mouseover"
-onMouseOut   = dataOn "mouseout"
+onMouseOver = dataOn "mouseover"
+onMouseOut = dataOn "mouseout"
 
 onWheel, onScroll, onResize, onContextMenu :: Text -> Attribute
-onWheel       = dataOn "wheel"
-onScroll      = dataOn "scroll"
-onResize      = dataOn "resize"
+onWheel = dataOn "wheel"
+onScroll = dataOn "scroll"
+onResize = dataOn "resize"
 onContextMenu = dataOn "contextmenu"
 
 onTouchStart, onTouchEnd, onTouchMove :: Text -> Attribute
 onTouchStart = dataOn "touchstart"
-onTouchEnd   = dataOn "touchend"
-onTouchMove  = dataOn "touchmove"
+onTouchEnd = dataOn "touchend"
+onTouchMove = dataOn "touchmove"
 
 onDragStart, onDragEnd, onDrop :: Text -> Attribute
 onDragStart = dataOn "dragstart"
-onDragEnd   = dataOn "dragend"
-onDrop      = dataOn "drop"
+onDragEnd = dataOn "dragend"
+onDrop = dataOn "drop"
 
 onCopy, onCut, onPaste :: Text -> Attribute
-onCopy  = dataOn "copy"
-onCut   = dataOn "cut"
+onCopy = dataOn "copy"
+onCut = dataOn "cut"
 onPaste = dataOn "paste"
 
 onLoad :: Text -> Attribute
@@ -212,8 +228,8 @@ onLoad = dataOn "load"
 
 onAnimationStart, onAnimationEnd, onTransitionEnd :: Text -> Attribute
 onAnimationStart = dataOn "animationstart"
-onAnimationEnd   = dataOn "animationend"
-onTransitionEnd  = dataOn "transitionend"
+onAnimationEnd = dataOn "animationend"
+onTransitionEnd = dataOn "transitionend"
 
 -- ---------------------------------------------------------------------------
 -- Reactive attributes
@@ -311,8 +327,9 @@ dataIndicatorValue signal = ("data-indicator", signal)
 -- Lifecycle events
 -- ---------------------------------------------------------------------------
 
--- | @data-on-intersect="\<expr\>"@. Combine with 'full', 'half', 'threshold',
--- 'once', 'exit'.
+{- | @data-on-intersect="\<expr\>"@. Combine with 'full', 'half', 'threshold',
+'once', 'exit'.
+-}
 dataOnIntersect :: Text -> Attribute
 dataOnIntersect expr = ("data-on-intersect", expr)
 
@@ -357,8 +374,9 @@ withModifierTags :: Text -> [Text] -> Attribute -> Attribute
 withModifierTags label tags (k, v) =
   (k <> "__" <> label <> T.concat (map ("." <>) tags), v)
 
--- | Build any @(name, value)@ pair directly. Escape hatch for attributes or
--- modifiers this module doesn't model.
+{- | Build any @(name, value)@ pair directly. Escape hatch for attributes or
+modifiers this module doesn't model.
+-}
 rawAttr :: Text -> Text -> Attribute
 rawAttr = (,)
 
@@ -366,8 +384,8 @@ rawAttr = (,)
 
 prevent, stop, once, capture, passive :: Attribute -> Attribute
 prevent = withModifier "prevent"
-stop    = withModifier "stop"
-once    = withModifier "once"
+stop = withModifier "stop"
+once = withModifier "once"
 capture = withModifier "capture"
 passive = withModifier "passive"
 
@@ -412,9 +430,9 @@ delay ms = withModifierTags "delay" [renderMs ms]
 -- Casing -------------------------------------------------------------------
 
 camelCase, kebabCase, snakeCase, pascalCase :: Attribute -> Attribute
-camelCase  = withModifierTags "case" ["camel"]
-kebabCase  = withModifierTags "case" ["kebab"]
-snakeCase  = withModifierTags "case" ["snake"]
+camelCase = withModifierTags "case" ["camel"]
+kebabCase = withModifierTags "case" ["kebab"]
+snakeCase = withModifierTags "case" ["snake"]
 pascalCase = withModifierTags "case" ["pascal"]
 
 -- on-intersect -------------------------------------------------------------
@@ -473,14 +491,15 @@ self = withModifier "self"
 -- Tag constants
 -- ---------------------------------------------------------------------------
 
--- $tags
--- Plain 'Text' values for use with the @*With@ combinators.
+{- $tags
+Plain 'Text' values for use with the @*With@ combinators.
+-}
 
 leading, noTrailing, noLeading, trailing :: Text
-leading    = "leading"
+leading = "leading"
 noTrailing = "notrailing"
-noLeading  = "noleading"
-trailing   = "trailing"
+noLeading = "noleading"
+trailing = "trailing"
 
 -- ---------------------------------------------------------------------------
 -- Internal

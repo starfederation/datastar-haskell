@@ -100,11 +100,14 @@ module Hypermedia.Datastar
   , isDatastarRequest
 
     -- * Compression
-    --
-    -- | Negotiate @Content-Encoding@ for an SSE stream. Pass one or more
-    -- compressors from the add-on packages @datastar-hs-zlib@,
-    -- @datastar-hs-brotli@, or @datastar-hs-zstd@. 'sseResponseWith' uses
-    -- 'ServerPriority'; 'sseResponseWithStrategy' lets you choose.
+
+  --
+
+    {- | Negotiate @Content-Encoding@ for an SSE stream. Pass one or more
+    compressors from the add-on packages @datastar-hs-zlib@,
+    @datastar-hs-brotli@, or @datastar-hs-zstd@. 'sseResponseWith' uses
+    'ServerPriority'; 'sseResponseWithStrategy' lets you choose.
+    -}
   , Compressor
   , CompressionStrategy (..)
   , sseResponseWith

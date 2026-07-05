@@ -9,8 +9,9 @@ import Network.Wai (defaultRequest, requestHeaders)
 import Hypermedia.Datastar
 import Hypermedia.Datastar.WAI (Compressor (..), negotiateWith)
 
--- | A compressor that only carries an encoding token, for negotiation tests.
--- Its 'compressorWrap' is never invoked by 'negotiateWith'.
+{- | A compressor that only carries an encoding token, for negotiation tests.
+Its 'compressorWrap' is never invoked by 'negotiateWith'.
+-}
 fakeCompressor :: BL.ByteString -> Compressor
 fakeCompressor enc = Compressor (BL.toStrict enc) (\_ _ -> error "unused")
 
@@ -19,7 +20,7 @@ spec = describe "negotiateWith" $ do
   let br = fakeCompressor "br"
       gz = fakeCompressor "gzip"
       enc = fmap compressorEncoding
-      req h = defaultRequest {requestHeaders = [("Accept-Encoding", h)]}
+      req h = defaultRequest{requestHeaders = [("Accept-Encoding", h)]}
 
   it "ServerPriority picks the first server compressor the client accepts" $
     enc (negotiateWith ServerPriority [br, gz] (req "gzip, br")) `shouldBe` Just "br"

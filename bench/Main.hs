@@ -37,11 +37,10 @@ wireBytes (ResponseStream _ _ body) = do
     (pure ())
 
   readMVar nrBytes
-
 wireBytes _ = error "expected a streaming response"
 
 sendAll :: [Text] -> ServerSentEventGenerator -> IO ()
-sendAll frags gen = forM_ frags (sendPatchElements gen . patchElements) 
+sendAll frags gen = forM_ frags (sendPatchElements gen . patchElements)
 
 rawBytes :: [Text] -> IO Int
 rawBytes frags = wireBytes (sseResponse nullLogger (sendAll frags))

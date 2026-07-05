@@ -46,23 +46,23 @@ deflateWith level = zlibCompressor "deflate" level (WindowBits 15)
 -- WindowBits 31 selects gzip framing, 15 selects zlib/deflate framing.
 zlibCompressor :: BS.ByteString -> Int -> WindowBits -> Compressor
 zlibCompressor enc level wbits = Compressor enc wrap
-  where 
-    wrap rawWrite rawFlush = do
-        def <- initDeflate level wbits
+ where
+  wrap rawWrite rawFlush = do
+    def <- initDeflate level wbits
 
-        let drain popper = do
-              res <- popper
-              case res of
-                PRDone -> pure ()
-                PRNext bs -> rawWrite (BSB.byteString bs) >> drain popper
-                PRError e -> throwIO e
+    let drain popper = do
+          res <- popper
+          case res of
+            PRDone -> pure ()
+            PRNext bs -> rawWrite (BSB.byteString bs) >> drain popper
+            PRError e -> throwIO e
 
-            write builder = do
-              popper <- feedDeflate def $ BL.toStrict $ BSB.toLazyByteString builder
-              drain popper
+        write builder = do
+          popper <- feedDeflate def $ BL.toStrict $ BSB.toLazyByteString builder
+          drain popper
 
-            flush = drain (flushDeflate def) >> rawFlush
+        flush = drain (flushDeflate def) >> rawFlush
 
-            finish = drain (finishDeflate def) >> rawFlush
+        finish = drain (finishDeflate def) >> rawFlush
 
-        pure (write, flush, finish)
+    pure (write, flush, finish)
