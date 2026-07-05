@@ -16,8 +16,14 @@ of `datastar-hs` in each sub-package.
 ## 1. Build the source distributions
 
 ```sh
-cabal sdist datastar-hs datastar-hs-zlib datastar-hs-brotli
+cabal sdist . datastar-hs-zlib datastar-hs-brotli
 ```
+
+The core must be named as `.` — `cabal sdist datastar-hs` trips over a cabal
+target-resolution bug (Cabal-7151, "component library cannot be packaged")
+now that sibling packages share the name as a prefix. Don't use
+`cabal sdist all`: it also tarballs the unreleased packages and the pinned
+hs-zstd checkout.
 
 This produces `dist-newstyle/sdist/<package>-<version>.tar.gz`.
 
