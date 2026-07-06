@@ -51,9 +51,8 @@ import Data.ByteString qualified as BS
 import Data.ByteString.Builder qualified as BSB
 import Data.ByteString.Char8 qualified as BS8
 
-import           Data.List  (find)
-import           Data.Maybe (listToMaybe)
-
+import Data.List (find)
+import Data.Maybe (listToMaybe)
 
 import Network.HTTP.Types qualified as WAI
 import Network.Wai qualified as WAI
@@ -64,18 +63,20 @@ import Hypermedia.Datastar.ExecuteScript qualified as ES
 import Hypermedia.Datastar.Logger qualified as Logger
 import Hypermedia.Datastar.PatchElements qualified as PE
 import Hypermedia.Datastar.PatchSignals qualified as PS
-data Compressor = Compressor 
+
+data Compressor = Compressor
   { compressorEncoding :: BS.ByteString
   -- ^ The @Content-Encoding@ token, e.g. @"br"@ for Brotli compression.
+  , compressorWrap
+      :: (BSB.Builder -> IO ())
+      -> IO ()
+      -> IO (BSB.Builder -> IO (), IO (), IO ())
+  {- ^ @compressorWrap rawWrite rawFlush@ returns @(write, flush, finish)@.
 
-  , compressorWrap :: (BSB.Builder -> IO ())
-                   -> IO ()
-                   -> IO (BSB.Builder -> IO (), IO (), IO ())
-  -- ^ @compressorWrap rawWrite rawFlush@ returns @(write, flush, finish)@.
-  --
-  -- * @write@ compresses and forwards bytes for an event;
-  -- * @flush@ flushes the compression encoded and then the underlying raw transport;
-  -- * @finish@ closes the compression stream.
+  * @write@ compresses and forwards bytes for an event;
+  * @flush@ flushes the compression encoded and then the underlying raw transport;
+  * @finish@ closes the compression stream.
+  -}
   }
 
 data CompressionStrategy
@@ -84,9 +85,10 @@ data CompressionStrategy
   | Forced
   deriving (Eq, Show)
 
--- | Faithful port of the Go reference parser: split on ',', trim surrounding
--- whitespace, take the token before ';', drop empties. No q-value handling,
--- no case folding, no wildcard logic.
+{- | Faithful port of the Go reference parser: split on ',', trim surrounding
+whitespace, take the token before ';', drop empties. No q-value handling,
+no case folding, no wildcard logic.
+-}
 parseEncodings :: BS.ByteString -> [BS.ByteString]
 parseEncodings header =
   [ token
@@ -94,18 +96,19 @@ parseEncodings header =
   , let token = BS8.takeWhile (/= ';') (strip part)
   , not (BS8.null token)
   ]
-  where
-    strip   = BS8.dropWhile isOWS . BS8.dropWhileEnd isOWS
-    isOWS c = c == ' ' || c == '\t'
+ where
+  strip = BS8.dropWhile isOWS . BS8.dropWhileEnd isOWS
+  isOWS c = c == ' ' || c == '\t'
 
--- | The encoding tokens of a request's @Accept-Encoding@ header, in order.
--- An absent or empty header yields [].
+{- | The encoding tokens of a request's @Accept-Encoding@ header, in order.
+An absent or empty header yields [].
+-}
 clientEncodings :: WAI.Request -> [BS.ByteString]
-clientEncodings req 
-  = maybe
-     [] 
-     parseEncodings
-     (lookup WAI.hAcceptEncoding $ WAI.requestHeaders req)
+clientEncodings req =
+  maybe
+    []
+    parseEncodings
+    (lookup WAI.hAcceptEncoding $ WAI.requestHeaders req)
 
 {- | Pick a compressor for a request's @Accept-Encoding@ header using the given
 'CompressionStrategy', or 'Nothing' if none applies. Token matching is exact
@@ -117,21 +120,19 @@ negotiateWith strategy compressors req =
     ServerPriority ->
       -- first server compressor whose token the client sent
       find (\c -> compressorEncoding c `elem` accepted) compressors
-
     ClientPriority ->
       -- first client token (header order) that the server offers
       listToMaybe
         [ c
         | enc <- accepted
-        , c   <- compressors
+        , c <- compressors
         , compressorEncoding c == enc
         ]
-
     Forced ->
       -- first configured compressor, regardless of Accept-Encoding
       listToMaybe compressors
-  where
-    accepted = clientEncodings req
+ where
+  accepted = clientEncodings req
 
 {- | An opaque handle for sending SSE events to the browser.
 
@@ -266,7 +267,7 @@ readSignals :: (FromJSON a) => WAI.Request -> IO (Either String a)
 readSignals req
   | WAI.requestMethod req == "GET"
       || WAI.requestMethod req == "DELETE" =
-          pure $ parseFromQuery req
+      pure $ parseFromQuery req
   | otherwise =
       parseFromBody req
 

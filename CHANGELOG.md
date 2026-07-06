@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.1.0.0
+
+* **Breaking**: the compressor modules moved to add-on packages so that the
+  core `datastar-hs` has no system-library dependencies.
+  GHC builds it.
+  * `Hypermedia.Datastar.Compression.Zlib` (`gzip`, `deflate`) →
+    [`datastar-hs-zlib`](https://hackage.haskell.org/package/datastar-hs-zlib)
+  * `Hypermedia.Datastar.Compression.Brotli` (`brotli`) →
+    [`datastar-hs-brotli`](https://hackage.haskell.org/package/datastar-hs-brotli)
+  * `Hypermedia.Datastar.Compression.Zstd` (`zstd`) → `datastar-hs-zstd`
+    (not yet on Hackage; the `zstd` cabal flag is gone — build the add-on
+    from this repository instead)
+* `Compressor`, `CompressionStrategy`, `sseResponseWith`, and
+  `sseResponseWithStrategy` are unchanged and stay in the core.
+
 ## 1.0.2.1
 
 * Fix the `zstd` ratio in the `compression-bench` output (it reported brotli's

@@ -7,6 +7,35 @@ on:
     branches: [main]
 
 jobs:
+  # Core package, no compressors.
+  core-no-system-libs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: haskell-actions/setup@v2
+        with:
+          ghc-version: "9.6.7"
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cabal/store
+            dist-newstyle
+          key: ${{ runner.os }}-cabal-core-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/*.hs') }}
+          restore-keys: |
+            ${{ runner.os }}-cabal-core-${{ hashFiles('**/*.cabal') }}-
+            ${{ runner.os }}-cabal-core-
+
+      - name: Build
+        run: cabal update && cabal build --project-file=cabal.project.core all
+
+      - name: Run tests
+        run: cabal test --project-file=cabal.project.core all
+
+  # Full build: compressor add-on packages, examples, and benchmarks.
   test:
     runs-on: ubuntu-latest
 
@@ -32,14 +61,13 @@ jobs:
             ${{ runner.os }}-cabal-
 
       - name: Install dependencies
-        run: cabal update && cabal build --only-dependencies
+        run: cabal update && cabal build all --only-dependencies
 
       - name: Build
-        run: cabal build
+        run: cabal build all
 
       - name: Run tests
-        run: cabal test
-
+        run: cabal test all
 
   e2e:
     runs-on: ubuntu-latest
@@ -52,22 +80,19 @@ jobs:
         with:
           ghc-version: "9.6.7"
 
-      - name: Install system libraries (brotli, zstd, zlib)
-        run: sudo apt-get update && sudo apt-get install -y pkg-config libbrotli-dev libzstd-dev zlib1g-dev
-
       - name: Cache
         uses: actions/cache@v4
         with:
           path: |
             ~/.cabal/store
             dist-newstyle
-          key: ${{ runner.os }}-cabal-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/*.hs') }}
+          key: ${{ runner.os }}-cabal-core-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/*.hs') }}
           restore-keys: |
-            ${{ runner.os }}-cabal-${{ hashFiles('**/*.cabal') }}-
-            ${{ runner.os }}-cabal-
+            ${{ runner.os }}-cabal-core-${{ hashFiles('**/*.cabal') }}-
+            ${{ runner.os }}-cabal-core-
 
       - name: Build e2e-server
-        run: cabal update && cabal build e2e-server
+        run: cabal update && cabal build --project-file=cabal.project.core e2e-server
 
       - uses: actions/setup-node@v4
         with:

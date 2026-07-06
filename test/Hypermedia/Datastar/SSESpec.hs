@@ -9,9 +9,6 @@ import Data.IORef
 import Data.List (isInfixOf)
 
 import Hypermedia.Datastar
-import Hypermedia.Datastar.Logger (nullLogger)
-import Hypermedia.Datastar.PatchElements
-import Hypermedia.Datastar.PatchSignals
 import Hypermedia.Datastar.Types
 import Hypermedia.Datastar.WAI (renderEvent)
 import Network.Wai.Internal (Response (..))

@@ -1,0 +1,4 @@
+-- Core-only project. proves that datastar-hs (library, tests, e2e-server)
+packages: .
+
+constraints: memory < 0.18

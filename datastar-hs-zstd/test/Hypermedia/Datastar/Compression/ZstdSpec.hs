@@ -16,8 +16,9 @@ import Hypermedia.Datastar.Compression.Zstd (zstd)
 import Hypermedia.Datastar.Logger (nullLogger)
 import Hypermedia.Datastar.WAI (compressorWrap)
 
--- | Drive a streaming WAI response to completion, returning its response headers
--- and the full raw body.
+{- | Drive a streaming WAI response to completion, returning its response headers
+and the full raw body.
+-}
 runStream (ResponseStream _status headers body) = do
   ref <- newIORef mempty
   body (\chunk -> modifyIORef' ref (<> chunk)) (pure ())
@@ -31,7 +32,7 @@ spec = describe "Hypermedia.Datastar.Compression.Zstd" $ do
         sendPatchElements gen (patchElements "<div id=\"a\">1</div>")
         sendPatchElements gen (patchElements "<div id=\"b\">2</div>")
         sendPatchSignals gen (patchSignals "{\"count\":42}")
-      withAccept enc = defaultRequest {requestHeaders = [("Accept-Encoding", enc)]}
+      withAccept enc = defaultRequest{requestHeaders = [("Accept-Encoding", enc)]}
 
   it "round-trips to the uncompressed stream" $ do
     (_, reference) <- runStream (sseResponse nullLogger sendEvents)

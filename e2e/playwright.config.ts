@@ -6,7 +6,9 @@ export default defineConfig({
     baseURL: "http://localhost:3113",
   },
   webServer: {
-    command: "cabal run e2e-server",
+    // cabal.project.core: e2e-server needs no system libraries, and CI runs
+    // this job without any installed.
+    command: "cabal run --project-file=cabal.project.core e2e-server",
     cwd: "..",
     url: "http://localhost:3113",
     reuseExistingServer: !process.env.CI,

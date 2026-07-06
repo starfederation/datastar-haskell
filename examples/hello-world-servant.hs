@@ -6,7 +6,6 @@ import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as LBS
 import Data.Text qualified as T
 import Hypermedia.Datastar
-import Hypermedia.Datastar.Compression.Brotli (brotli)
 import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
 import Network.HTTP.Media ((//))
 import Network.HTTP.Types (status404)
@@ -33,7 +32,7 @@ message :: String
 message = "Hello, world!"
 
 compressors :: [Compressor]
-compressors = [brotli, gzip, deflate]
+compressors = [gzip, deflate]
 
 type API =
   Get '[HTML] LBS.ByteString

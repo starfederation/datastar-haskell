@@ -1,11 +1,18 @@
-packages: .
+-- Full development project: core plus the compressor add-ons, examples, and
+-- benchmarks. Building everything needs system libraries (libbrotli, libzstd,
+-- zlib headers). To build/test just the dependency-free core, use
+-- cabal.project.core:
+--
+--   cabal build --project-file=cabal.project.core all
+packages:
+  .
+  datastar-hs-zlib
+  datastar-hs-brotli
+  datastar-hs-zstd
+  examples
+  bench
 
 constraints: memory < 0.18
-
--- Build the zstd compressor locally (the library flag is off by default so the
--- Hackage build stays clean). Relies on the source-repository-package pin below.
-package datastar-hs
-  flags: +zstd
 
 -- hs-zstd: pinned to an unreleased commit with the streaming FFI binding
 -- for flushStream; revert to Hackage once published.
