@@ -32,3 +32,5 @@ e2e/playwright-report/
 tmp/
 
 result
+
+.direnv
