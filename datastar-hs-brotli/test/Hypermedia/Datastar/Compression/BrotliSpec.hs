@@ -12,7 +12,6 @@ import Network.Wai.Internal (Response (..))
 
 import Hypermedia.Datastar
 import Hypermedia.Datastar.Compression.Brotli (brotli)
-import Hypermedia.Datastar.Logger (nullLogger)
 import Hypermedia.Datastar.WAI (compressorWrap)
 
 {- | Drive a streaming WAI response to completion, returning its response headers

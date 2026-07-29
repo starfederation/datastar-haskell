@@ -17,7 +17,6 @@ import Network.Wai.Internal (Response (..))
 
 import Hypermedia.Datastar
 import Hypermedia.Datastar.Compression.Zlib (deflate, gzip)
-import Hypermedia.Datastar.Logger (nullLogger)
 import Hypermedia.Datastar.WAI (compressorWrap)
 
 {- | Drive a streaming WAI response to completion, returning its response headers
