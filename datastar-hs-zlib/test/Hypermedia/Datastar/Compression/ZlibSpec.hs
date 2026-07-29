@@ -12,6 +12,7 @@ import Data.ByteString.Char8 qualified as BS8
 import Data.ByteString.Lazy qualified as BL
 import Data.IORef
 
+import Network.HTTP.Types (ResponseHeaders)
 import Network.Wai (defaultRequest, requestHeaders)
 import Network.Wai.Internal (Response (..))
 
@@ -22,6 +23,7 @@ import Hypermedia.Datastar.WAI (compressorWrap)
 {- | Drive a streaming WAI response to completion, returning its response headers
 and the full raw body.
 -}
+runStream :: Response -> IO (ResponseHeaders, BL.ByteString)
 runStream (ResponseStream _status headers body) = do
   ref <- newIORef mempty
   body (\chunk -> modifyIORef' ref (<> chunk)) (pure ())

@@ -63,6 +63,7 @@ test-suite datastar-hs-brotli-test
     , datastar-hs
     , datastar-hs-brotli
     , hspec
+    , http-types
     , wai
   default-language: Haskell2010
   default-extensions:
