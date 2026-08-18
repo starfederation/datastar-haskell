@@ -98,8 +98,10 @@ test-suite datastar-hs-test
     Hypermedia.Datastar.NegotiationSpec
     Hypermedia.Datastar.PatchElementsSpec
     Hypermedia.Datastar.PatchSignalsSpec
+    Hypermedia.Datastar.ReadSignalsSpec
     Hypermedia.Datastar.SSESpec
   build-depends:
+    , aeson
     , base
     , bytestring
     , datastar-hs
