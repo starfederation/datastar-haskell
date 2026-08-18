@@ -274,8 +274,7 @@ readSignals req
 parseFromQuery :: (FromJSON a) => WAI.Request -> Either String a
 parseFromQuery req =
   case lookup "datastar" (WAI.queryString req) of
-    (Just (Just val)) ->
-      A.eitherDecodeStrict $ WAI.urlDecode True val
+    (Just (Just val)) -> A.eitherDecodeStrict val
     _ -> Left "missing 'datastar' query parameter"
 
 parseFromBody :: (FromJSON a) => WAI.Request -> IO (Either String a)
