@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0.1
+
+All changes contributed by [@sectore](https://github.com/sectore) — thanks!
+
+* Fix double URL-decoding of the `datastar` query parameter in `readSignals`
+  (GET/DELETE requests). `WAI.queryString` is already decoded, so the extra
+  decode corrupted signal values containing literal `+` or `%` characters
+  ([#8](https://github.com/starfederation/datastar-haskell/pull/8))
+* Fix GHC warnings in the add-on packages' test suites
+  ([#6](https://github.com/starfederation/datastar-haskell/pull/6))
+* Add a `haskell-flake` based Nix flake for development
+  ([#7](https://github.com/starfederation/datastar-haskell/pull/7))
+
 ## 1.1.0.0
 
 * **Breaking**: the compressor modules moved to add-on packages so that the
