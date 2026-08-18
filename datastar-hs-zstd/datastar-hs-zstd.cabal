@@ -67,6 +67,7 @@ test-suite datastar-hs-zstd-test
     , datastar-hs-zlib
     , datastar-hs-zstd
     , hspec
+    , http-types
     , wai
     , zstd
   default-language: Haskell2010
