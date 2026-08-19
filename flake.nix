@@ -42,10 +42,21 @@
               };
             };
 
-            devShell.tools = hp: {
-              # cabal-install, haskell-language-server, ghcid and hlint are defaults.
-              inherit (hp) fourmolu cabal-fmt;
-              inherit (pkgs) pkg-config nixfmt nixd;
+            devShell = {
+              tools = hp: {
+                # cabal-install, haskell-language-server, ghcid and hlint are defaults.
+                inherit (hp) fourmolu cabal-fmt;
+                inherit (pkgs) pkg-config nixfmt nixd;
+              };
+
+              # compressor sub-packages link against system C libs:
+              # datastar-hs-brotli -> brotli
+              # datastar-hs-zlib -> zlib
+              # datastar-hs-zstd -> none (vendors its own C sources via hs-zstd and its git submodule)
+              mkShellArgs.buildInputs = [
+                pkgs.brotli
+                pkgs.zlib
+              ];
             };
           };
 
