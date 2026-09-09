@@ -5,10 +5,9 @@ The repository holds several packages. Released to Hackage:
 - `datastar-hs` (core, at the repository root)
 - `datastar-hs-zlib`
 - `datastar-hs-brotli`
+- `datastar-hs-zstd`
 
-Not released: `datastar-hs-zstd` (depends on an unreleased hs-zstd, see
-[#3](https://github.com/starfederation/datastar-haskell/issues/3)),
-`datastar-hs-examples`, and `datastar-hs-bench` (repo-internal).
+Not released: `datastar-hs-examples` and `datastar-hs-bench` (repo-internal).
 
 Release the core first when its version bumped. Also bump the lower bound
 of `datastar-hs` in each sub-package.
@@ -16,14 +15,13 @@ of `datastar-hs` in each sub-package.
 ## 1. Build the source distributions
 
 ```sh
-cabal sdist . datastar-hs-zlib datastar-hs-brotli
+cabal sdist . datastar-hs-zlib datastar-hs-brotli datastar-hs-zstd
 ```
 
 The core must be named as `.` — `cabal sdist datastar-hs` trips over a cabal
 target-resolution bug (Cabal-7151, "component library cannot be packaged")
 now that sibling packages share the name as a prefix. Don't use
-`cabal sdist all`: it also tarballs the unreleased packages and the pinned
-hs-zstd checkout.
+`cabal sdist all`: it also tarballs the repo-internal packages.
 
 This produces `dist-newstyle/sdist/<package>-<version>.tar.gz`.
 

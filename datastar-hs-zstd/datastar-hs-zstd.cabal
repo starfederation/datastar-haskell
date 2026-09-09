@@ -6,14 +6,9 @@ description:
   @zstd@ @Content-Encoding@ compressor for
   <https://hackage.haskell.org/package/datastar-hs datastar-hs> SSE streams.
   .
-  Links against the system zstd C library: @brew install zstd@ on macOS,
-  @apt-get install libzstd-dev@ on Debian/Ubuntu.
-  .
-  NOT YET ON HACKAGE: streaming compression needs an unreleased hs-zstd
-  (flushStream FFI). Build from the datastar-haskell repository, which pins
-  the hs-zstd commit via a @source-repository-package@ stanza in
-  @cabal.project@. See
-  <https://github.com/starfederation/datastar-haskell/issues/3>.
+  No system library needed: the <https://hackage.haskell.org/package/zstd zstd>
+  package bundles the zstd C sources by default (its @standalone@ flag).
+  Requires @zstd >= 0.1.4@ for the streaming @flushStream@ binding.
 homepage:        https://github.com/starfederation/datastar-haskell
 bug-reports:     https://github.com/starfederation/datastar-haskell/issues
 license:         MIT
@@ -51,7 +46,7 @@ library
     , base       >= 4.14  && < 5
     , bytestring >= 0.10.12 && < 1
     , datastar-hs >= 1.1 && < 1.2
-    , zstd       >= 0.1.3 && < 1
+    , zstd       >= 0.1.4 && < 1
 
 test-suite datastar-hs-zstd-test
   import: warnings

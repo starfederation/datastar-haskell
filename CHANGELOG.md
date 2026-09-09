@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0.2
+
+* Doc-only release: the package description now links to
+  [`datastar-hs-zstd`](https://hackage.haskell.org/package/datastar-hs-zstd),
+  which is on Hackage now that `zstd-0.1.4.0` ships the streaming
+  `flushStream` FFI binding
+  ([#3](https://github.com/starfederation/datastar-haskell/issues/3)).
+  The hs-zstd `source-repository-package` pin is gone from `cabal.project`,
+  and no system libzstd is needed: the `zstd` package bundles the C sources.
+
 ## 1.1.0.1
 
 All changes contributed by [@sectore](https://github.com/sectore) — thanks!

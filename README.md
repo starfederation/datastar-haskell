@@ -83,7 +83,7 @@ the core `datastar-hs` has no system-library dependencies:
 |---|---|---|
 | `datastar-hs-zlib` | `gzip`, `deflate` | zlib -- preinstalled on macOS; `zlib1g-dev` on Debian/Ubuntu, or build with the constraint `zlib +bundled-c-zlib` for no system library at all |
 | `datastar-hs-brotli` | `br` | `brew install brotli` / `apt-get install libbrotli-dev pkg-config` |
-| `datastar-hs-zstd` | `zstd` | `brew install zstd` / `apt-get install libzstd-dev` -- not yet on Hackage, see below |
+| `datastar-hs-zstd` | `zstd` | none -- the `zstd` package bundles the zstd C sources by default |
 
 Add one to `build-depends` and pass its compressors to `sseResponseWith`
 (or `sseResponseWithStrategy`) in preference order:
@@ -135,8 +135,10 @@ a large blob with small changes.
 
 ### zstd upstream package
 
-We [added support for flushStream](https://github.com/starfederation/datastar-haskell/issues/3) to
-hs-zstd; until we get a new release on hackage, we are pinning the github source using `cabal.project`.
+Streaming compression needs `flushStream`, which we
+[added](https://github.com/starfederation/datastar-haskell/issues/3) to
+hs-zstd. It shipped in `zstd-0.1.4.0` on Hackage, so `datastar-hs-zstd`
+requires `zstd >= 0.1.4`.
 
 ### zstd window size
 

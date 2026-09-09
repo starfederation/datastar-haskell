@@ -1,6 +1,6 @@
 cabal-version:   3.0
 name:            datastar-hs
-version:         1.1.0.1
+version:         1.1.0.2
 synopsis:        Haskell bindings for Datastar
 description:
   Server-side SDK for building real-time hypermedia applications with
@@ -14,7 +14,9 @@ description:
   <https://hackage.haskell.org/package/datastar-hs-zlib datastar-hs-zlib>
   (gzip, deflate),
   <https://hackage.haskell.org/package/datastar-hs-brotli datastar-hs-brotli>
-  (br), and datastar-hs-zstd (zstd, not yet on Hackage).
+  (br), and
+  <https://hackage.haskell.org/package/datastar-hs-zstd datastar-hs-zstd>
+  (zstd).
 homepage:        https://github.com/starfederation/datastar-haskell
 bug-reports:     https://github.com/starfederation/datastar-haskell/issues
 license:         MIT
