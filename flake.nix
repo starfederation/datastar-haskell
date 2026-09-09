@@ -23,14 +23,12 @@
         {
           haskellProjects.default = {
             packages = {
-              # `haskell-flake` ignores `source-repository-package` defined in `cabal.project`.
-              # That's why `hs-zstd` needs to be pinned here. All because of https://github.com/starfederation/datastar-haskell/issues/3
-              # Note: `fetchSubmodules` is needed -> `zstd.cabal` provides `zstd` in a submodule.
-              zstd.source = pkgs.fetchgit {
-                url = "https://github.com/luispedro/hs-zstd";
-                rev = "59c0d21ab65a6296e06446c8368d78b9b4c7e64d";
-                fetchSubmodules = true;
-                hash = "sha256-jGRiFZf5M/mNOXeWjtEkDQOZEi0Vry+pYRLutJkHuT0=";
+              # datastar-hs-zstd needs `zstd >= 0.1.4` (streaming `flushStream` FFI,
+              # https://github.com/starfederation/datastar-haskell/issues/3), but nixpkgs
+              # still ships zstd-0.1.3.0, so pull the release tarball from Hackage.
+              zstd.source = pkgs.fetchzip {
+                url = "https://hackage.haskell.org/package/zstd-0.1.4.0/zstd-0.1.4.0.tar.gz";
+                hash = "sha256-+FbP4zIRfSJr3EKuO1i0+y6CAwBdPKPr/N/mFDzWOQ4=";
               };
 
               # Note: `WAI.hs` needs `hAcceptEncoding` (from `Network.HTTP.Types`),
@@ -52,7 +50,7 @@
               # compressor sub-packages link against system C libs:
               # datastar-hs-brotli -> brotli
               # datastar-hs-zlib -> zlib
-              # datastar-hs-zstd -> none (vendors its own C sources via hs-zstd and its git submodule)
+              # datastar-hs-zstd -> none (the zstd package bundles the zstd C sources)
               mkShellArgs.buildInputs = [
                 pkgs.brotli
                 pkgs.zlib
