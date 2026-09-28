@@ -25,6 +25,17 @@ sendPatchElements gen
     }
 @
 
+To animate the update with a view transition, optionally scoped to a single
+element:
+
+@
+sendPatchElements gen
+  (patchElements "\<div id=\\\"feed\\\"\>...\<\/div\>")
+    { peUseViewTransition = True
+    , peViewTransitionSelector = Just \"#main\"
+    }
+@
+
 To remove elements from the DOM, use 'removeElements' with a CSS selector:
 
 @
@@ -61,6 +72,13 @@ data PatchElements = PatchElements
   <https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API View Transition>.
   Default: 'False'.
   -}
+  , peViewTransitionSelector :: Maybe Text
+  {- ^ CSS selector for the element to scope the view transition to (an
+  <https://developer.chrome.com/blog/element-scoped-view-transitions element-scoped view transition>).
+  Only sent when 'peUseViewTransition' is 'True'. When 'Nothing' (the
+  default), or when nothing matches the selector, the transition applies
+  to the whole document. Needs Datastar 1.0.2 or later in the browser.
+  -}
   , peNamespace :: ElementNamespace
   {- ^ XML namespace for the patched elements. Default: 'HtmlNs'. Use
   'SvgNs' or 'MathmlNs' when patching inline SVG or MathML.
@@ -91,6 +109,7 @@ patchElements html =
     , peSelector = Nothing
     , peMode = defaultPatchMode
     , peUseViewTransition = defaultUseViewTransition
+    , peViewTransitionSelector = Nothing
     , peNamespace = defaultNamespace
     , peEventId = Nothing
     , peRetryDuration = defaultRetryDuration
@@ -110,6 +129,7 @@ removeElements sel =
     , peSelector = Just sel
     , peMode = Remove
     , peUseViewTransition = defaultUseViewTransition
+    , peViewTransitionSelector = Nothing
     , peNamespace = defaultNamespace
     , peEventId = Nothing
     , peRetryDuration = defaultRetryDuration
@@ -129,6 +149,11 @@ toDatastarEvent pe =
             ]
           , [ "useViewTransition true"
             | peUseViewTransition pe
+            ]
+          , [ "viewTransitionSelector " <> s
+            | peUseViewTransition pe
+            , Just s <- [peViewTransitionSelector pe]
+            , not (T.null s)
             ]
           , [ "namespace " <> namespaceToText (peNamespace pe)
             | peNamespace pe /= defaultNamespace

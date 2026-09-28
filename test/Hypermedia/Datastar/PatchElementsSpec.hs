@@ -26,6 +26,7 @@ spec = describe "Hypermedia.Datastar.PatchElements.toDatastarEvent" $ do
               { peSelector = Just "#feed"
               , peMode = Inner
               , peUseViewTransition = True
+              , peViewTransitionSelector = Just "#main"
               , peNamespace = HtmlNs
               , peEventId = Just "123"
               , peRetryDuration = 2000
@@ -38,6 +39,7 @@ spec = describe "Hypermedia.Datastar.PatchElements.toDatastarEvent" $ do
       `shouldBe` [ "selector #feed"
                  , "mode inner"
                  , "useViewTransition true"
+                 , "viewTransitionSelector #main"
                  , "elements <div id=\"feed\">"
                  , "elements     <span>1</span>"
                  , "elements </div>"
@@ -94,6 +96,46 @@ spec = describe "Hypermedia.Datastar.PatchElements.toDatastarEvent" $ do
         event = toDatastarEvent pe
         lines' = dataLines event
     any (T.isPrefixOf "mode") lines' `shouldBe` False
+
+  it "view transition without a selector" $ do
+    let pe = (patchElements "<p>hello</p>"){peUseViewTransition = True}
+        event = toDatastarEvent pe
+    dataLines event
+      `shouldBe` [ "useViewTransition true"
+                 , "elements <p>hello</p>"
+                 ]
+
+  it "viewTransitionSelector sits between useViewTransition and namespace" $ do
+    let pe =
+          (patchElements "<circle id=\"c1\" r=\"5\"/>")
+            { peUseViewTransition = True
+            , peViewTransitionSelector = Just "#vis"
+            , peNamespace = SvgNs
+            }
+        event = toDatastarEvent pe
+    dataLines event
+      `shouldBe` [ "useViewTransition true"
+                 , "viewTransitionSelector #vis"
+                 , "namespace svg"
+                 , "elements <circle id=\"c1\" r=\"5\"/>"
+                 ]
+
+  it "omits viewTransitionSelector when useViewTransition is False" $ do
+    let pe = (patchElements "<p>hello</p>"){peViewTransitionSelector = Just "#main"}
+        event = toDatastarEvent pe
+    dataLines event `shouldBe` ["elements <p>hello</p>"]
+
+  it "omits viewTransitionSelector when empty" $ do
+    let pe =
+          (patchElements "<p>hello</p>")
+            { peUseViewTransition = True
+            , peViewTransitionSelector = Just ""
+            }
+        event = toDatastarEvent pe
+    dataLines event
+      `shouldBe` [ "useViewTransition true"
+                 , "elements <p>hello</p>"
+                 ]
 
   it "politely ignores empty element strings" $ do
     let lines' =

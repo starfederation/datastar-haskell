@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.1.0
+
+* Add `peViewTransitionSelector` to `PatchElements`: a CSS selector for the
+  element to scope a view transition to, sent as the `viewTransitionSelector`
+  data line. It is only sent when `peUseViewTransition` is `True`, and needs
+  Datastar 1.0.2 or later in the browser. Code that builds events with
+  `patchElements` or `removeElements` is unaffected; code that uses the
+  `PatchElements` constructor directly needs the new field.
+* Bump the examples and the e2e test page to Datastar 1.0.3
+
 ## 1.1.0.2
 
 * Doc-only release: the package description now links to
