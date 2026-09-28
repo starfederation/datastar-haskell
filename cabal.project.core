@@ -2,3 +2,9 @@
 packages: .
 
 constraints: memory < 0.18
+
+-- Force the test suites into the build plan. By default the solver only
+-- prefers them: when the newest release of a shared dependency is too new
+-- for hspec (QuickCheck 2.19 was), it drops the test suites instead of
+-- backtracking, and `cabal test` fails with Cabal-7043.
+tests: True
