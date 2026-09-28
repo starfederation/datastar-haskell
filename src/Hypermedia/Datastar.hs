@@ -6,7 +6,7 @@ Description : Haskell SDK for building real-time hypermedia apps with Datastar
 building a JSON API and a JavaScript SPA, you write HTML on the server and
 let Datastar handle the interactivity. The browser sends requests, the
 server holds the connection open as a server-sent event (SSE) stream, and
-pushes HTML fragments, signal updates, or scripts back to the browser as
+pushes HTML elements, signal updates, or scripts back to the browser as
 things change.
 
 This SDK provides the server-side Haskell API. It builds on

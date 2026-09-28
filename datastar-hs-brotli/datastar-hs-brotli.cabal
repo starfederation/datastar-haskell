@@ -6,7 +6,7 @@ description:
   @br@ (Brotli) @Content-Encoding@ compressor for
   <https://hackage.haskell.org/package/datastar-hs datastar-hs> SSE streams.
   Brotli compresses extremely well on SSE streams that repeatedly patch
-  similar HTML fragments.
+  similar HTML elements.
   .
   Links against the system Brotli C library: @brew install brotli@ on macOS,
   @apt-get install libbrotli-dev pkg-config@ on Debian/Ubuntu.

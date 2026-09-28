@@ -109,7 +109,7 @@ a large blob with small changes.
 
 ```
 === Identical large grid every tick ===
-  400 events, ~130.7 KB uncompressed per fragment
+  400 events, ~130.7 KB of HTML per event, uncompressed
 
   none   :      51.1 MB
   gzip   :       4.0 MB  (   12.8x vs none)
@@ -117,7 +117,7 @@ a large blob with small changes.
   zstd   :      13.6 KB  ( 3854.3x vs none)
 
 === Fat update: large grid, only the caption changes each tick ===
-  400 events, ~130.7 KB uncompressed per fragment
+  400 events, ~130.7 KB of HTML per event, uncompressed
 
   none   :      51.1 MB
   gzip   :       4.0 MB  (   12.7x vs none)
@@ -125,7 +125,7 @@ a large blob with small changes.
   zstd   :      19.4 KB  ( 2697.3x vs none)
 
 === Small update: tiny clock div each tick ===
-  400 events, ~23 B uncompressed per fragment
+  400 events, ~23 B of HTML per event, uncompressed
 
   none   :      28.4 KB
   gzip   :       4.4 KB  (    6.5x vs none)
