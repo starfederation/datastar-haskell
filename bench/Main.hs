@@ -40,29 +40,29 @@ wireBytes (ResponseStream _ _ body) = do
 wireBytes _ = error "expected a streaming response"
 
 sendAll :: [Text] -> ServerSentEventGenerator -> IO ()
-sendAll frags gen = forM_ frags (sendPatchElements gen . patchElements)
+sendAll payloads gen = forM_ payloads (sendPatchElements gen . patchElements)
 
 rawBytes :: [Text] -> IO Int
-rawBytes frags = wireBytes (sseResponse nullLogger (sendAll frags))
+rawBytes payloads = wireBytes (sseResponse nullLogger (sendAll payloads))
 
 compressedBytes :: Compressor -> [Text] -> IO Int
-compressedBytes c frags =
-  wireBytes (sseResponseWithStrategy Forced nullLogger [c] defaultRequest (sendAll frags))
+compressedBytes c payloads =
+  wireBytes (sseResponseWithStrategy Forced nullLogger [c] defaultRequest (sendAll payloads))
 
 bench :: String -> [Text] -> IO ()
-bench name frags = do
-  let n = length frags
-      perEvent = if n == 0 then 0 else T.length (head frags)
-  rawN <- rawBytes frags
-  gzN <- compressedBytes gzip frags
-  brN <- compressedBytes brotli frags
+bench name payloads = do
+  let n = length payloads
+      perEvent = if n == 0 then 0 else T.length (head payloads)
+  rawN <- rawBytes payloads
+  gzN <- compressedBytes gzip payloads
+  brN <- compressedBytes brotli payloads
 
   printf "\n=== %s ===\n" name
-  printf "  %d events, ~%s uncompressed per fragment\n\n" n (human perEvent)
+  printf "  %d events, ~%s of HTML per event, uncompressed\n\n" n (human perEvent)
   printf "  none   : %12s\n" (human rawN)
   printf "  gzip   : %12s  (%7.1fx vs none)\n" (human gzN) (ratio rawN gzN)
   printf "  brotli : %12s  (%7.1fx vs none)\n" (human brN) (ratio rawN brN)
-  zstdN <- compressedBytes zstd frags
+  zstdN <- compressedBytes zstd payloads
   printf "  zstd   : %12s  (%7.1fx vs none)\n" (human zstdN) (ratio rawN zstdN)
 
 ratio :: Int -> Int -> Double
@@ -77,7 +77,7 @@ human n
 tshow :: Int -> Text
 tshow = T.pack . show
 
--- A self-similar table row (lots of intra-fragment repetition).
+-- A self-similar table row (lots of intra-row repetition).
 gridRow :: Int -> Text
 gridRow i =
   "<tr><td>" <> tshow i <> "</td><td>item-" <> tshow i <> "</td><td>active</td><td>0.00</td></tr>"

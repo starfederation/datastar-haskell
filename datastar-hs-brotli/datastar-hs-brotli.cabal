@@ -1,12 +1,12 @@
 cabal-version:   3.0
 name:            datastar-hs-brotli
-version:         1.0.0.0
+version:         1.0.1.0
 synopsis:        Brotli compressor for datastar-hs
 description:
   @br@ (Brotli) @Content-Encoding@ compressor for
   <https://hackage.haskell.org/package/datastar-hs datastar-hs> SSE streams.
   Brotli compresses extremely well on SSE streams that repeatedly patch
-  similar HTML fragments.
+  similar HTML elements.
   .
   Links against the system Brotli C library: @brew install brotli@ on macOS,
   @apt-get install libbrotli-dev pkg-config@ on Debian/Ubuntu.

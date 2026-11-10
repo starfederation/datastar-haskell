@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("PatchElements: server sends HTML fragment that morphs into the DOM", async ({
+test("PatchElements: server sends an HTML element that morphs into the DOM", async ({
   page,
 }) => {
   await expect(page.locator("#pe-result")).toHaveText("Waiting...");

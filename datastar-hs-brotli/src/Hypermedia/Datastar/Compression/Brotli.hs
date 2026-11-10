@@ -62,6 +62,6 @@ defaultBrotliParams :: B.CompressParams
 defaultBrotliParams =
   B.defaultCompressParams
     { B.compressMode = B.CompressionModeText
-    , B.compressLevel = B.CompressionLevel5
-    , B.compressWindowSize = B.CompressionWindowBits24
+    , B.compressLevel = B.CompressionLevel6
+    , B.compressWindowSize = B.CompressionWindowBits22
     }

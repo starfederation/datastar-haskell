@@ -1,14 +1,15 @@
 {- |
 Module      : Hypermedia.Datastar.PatchElements
-Description : Send HTML fragments to patch the browser DOM
+Description : Send HTML elements to patch the browser DOM
 
 \"Patch elements\" is Datastar's primary mechanism for updating the page: the
-server sends an HTML fragment and the browser morphs it into the DOM. The
-morphing algorithm preserves focus, scroll position, and CSS transitions,
+server sends complete HTML elements and the browser morphs them into the DOM.
+The morphing algorithm preserves focus, scroll position, and CSS transitions,
 so partial page updates feel seamless.
 
 The simplest case — send HTML and let Datastar match elements by @id@ —
-needs only 'patchElements':
+needs only 'patchElements'. Without a selector, each top-level element needs
+an @id@.
 
 @
 sendPatchElements gen (patchElements "\<div id=\\\"count\\\"\>42\<\/div\>")
@@ -55,13 +56,13 @@ with record updates.
 -}
 data PatchElements = PatchElements
   { peElements :: Maybe Text
-  {- ^ The HTML fragment to patch into the DOM. 'Nothing' when removing
-  elements (see 'removeElements').
+  {- ^ One or more complete HTML elements to patch into the DOM. 'Nothing'
+  when removing elements (see 'removeElements').
   -}
   , peSelector :: Maybe Text
   {- ^ CSS selector for the target element. When 'Nothing' (the default),
-  Datastar matches by the @id@ attribute of the root element in
-  'peElements'.
+  Datastar matches each top-level element in 'peElements' by its @id@
+  attribute.
   -}
   , peMode :: ElementPatchMode
   {- ^ How to apply the patch. Default: 'Outer' (replace the matched

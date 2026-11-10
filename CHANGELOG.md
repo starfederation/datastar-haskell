@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.2.0
+
+* Bump the examples and the e2e test page to Datastar 1.0.5
+* Docs: say "HTML elements" instead of "HTML fragments", following the
+  Datastar ADR, which requires complete HTML elements. The
+  `Hypermedia.Datastar.PatchElements` docs now also state that, without a
+  selector, each top-level element needs an `id`.
+
 ## 1.1.1.0
 
 * Add `peViewTransitionSelector` to `PatchElements`: a CSS selector for the
