@@ -113,7 +113,7 @@ a large blob with small changes.
 
   none   :      51.1 MB
   gzip   :       4.0 MB  (   12.8x vs none)
-  brotli :       9.0 KB  ( 5779.1x vs none)
+  brotli :       9.1 KB  ( 5764.8x vs none)
   zstd   :      13.6 KB  ( 3854.3x vs none)
 
 === Fat update: large grid, only the caption changes each tick ===
@@ -121,7 +121,7 @@ a large blob with small changes.
 
   none   :      51.1 MB
   gzip   :       4.0 MB  (   12.7x vs none)
-  brotli :       9.9 KB  ( 5265.5x vs none)
+  brotli :      10.0 KB  ( 5248.5x vs none)
   zstd   :      19.4 KB  ( 2697.3x vs none)
 
 === Small update: tiny clock div each tick ===

@@ -1,6 +1,6 @@
 cabal-version:   3.0
 name:            datastar-hs-brotli
-version:         1.0.0.0
+version:         1.0.1.0
 synopsis:        Brotli compressor for datastar-hs
 description:
   @br@ (Brotli) @Content-Encoding@ compressor for
