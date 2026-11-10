@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.1.2.0
 
+* Bump the examples and the e2e test page to Datastar 1.0.5
 * Docs: say "HTML elements" instead of "HTML fragments", following the
   Datastar ADR, which requires complete HTML elements. The
   `Hypermedia.Datastar.PatchElements` docs now also state that, without a
